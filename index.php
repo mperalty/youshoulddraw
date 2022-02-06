@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>You Should Draw - Random Art Ideas Generator</title>
-  <meta name="description" content="You Should Draw - Random Art Ideas Generator">
+  <title>You Should Draw - Random Character Art Ideas Generator</title>
+  <meta name="description" content="You Should Draw - Random Character Art Ideas Generator">
   <meta name="author" content="Malcolm Peralty">
 
   <link rel="stylesheet" href="style.css">
@@ -51,7 +51,6 @@ $(document).ready(function() {
   		});
   		 	return false;
 	});
-
 });
 </script>
 <h3 class="main"></h3>
@@ -59,7 +58,7 @@ $(document).ready(function() {
 <div id="draw_options">
 <form method="post" id="optionsform" action="<?php $_PHP_SELF ?>">
 <div class="left_side"><input type="checkbox" name="gender" id="gender" value="Gender">Random Gender?<br />
-<input type="checkbox" name="emotion" id="emotion"" value="Emotion">Random Emotion?<br />
+<input type="checkbox" name="emotion" id="emotion" value="Emotion">Random Emotion?<br />
 <input type="checkbox" name="pet" id="pet" value="Pet">Random Pet?</br>
 </div>
 <div class="right_side">
