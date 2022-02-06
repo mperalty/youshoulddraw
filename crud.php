@@ -4,7 +4,8 @@
 //PASSWORD CHECK
 
 //DB CONNECTION
-require_once "/includes/dbcon.php";
+ require "/includes/dbcon.php";
+
 
 // Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);
