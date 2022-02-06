@@ -1,0 +1,66 @@
+body {
+	background: #eee;
+	font: "Open Sans",Arial,sans-serif;
+}
+
+h3 {
+	width: 80%;
+	font: 2.0em "Open Sans",Arial,sans-serif;
+	text-align: center;
+	color: #09c;
+	padding: 25px 15px;
+	margin: 20px auto;
+	background: #fff;
+	border: 2px solid #aaa;
+}
+
+#draw_options { 
+	width: 40%;
+	display: none; 
+	text-align: center;
+	margin: 10px auto;
+	padding: 10px;
+}
+
+.subdraw_notice {
+	text-align: center;
+	margin: 10px auto;
+}
+
+.subdraw_notice a {
+	color: #fff;
+	text-decoration: none;
+}
+
+.button {
+	background-color: #09c; 
+	color: #fff;
+	text-decoration: none;
+	text-shadow:none;
+	border:none;
+	box-shadow:none;
+}
+
+.options {
+	padding: 5px 10px;
+	font: 1.2em "Open Sans",Arial,sans-serif;
+}
+
+.submit {
+	padding: 5px 10px;
+	font: 1.2em "Open Sans",Arial,sans-serif;
+}
+
+#draw_options .left_side {
+	display: inline-block;
+	position: relative;
+	width: 48%;
+	text-align: left;
+}
+
+#draw_options .right_side {
+	display: inline-block;
+	position: relative;
+	width: 48%;
+	text-align: left;
+}
