@@ -8,10 +8,7 @@ if($_POST){
 	$accessories = $_POST['accessories'];
 }
 	
-	$servername = "localhost";
-	$username = "secondcl_drawing";
-	$password = "t!klm90#A21!";
-	$dbname = "secondcl_ushoulddraw";
+	require_once "/includes/dbcon.php";
 	
 	// Create connection
 	$conn = new mysqli($servername, $username, $password, $dbname);
