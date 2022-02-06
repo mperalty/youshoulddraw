@@ -69,8 +69,10 @@ $(document).ready(function() {
 </div>
 <div class="subdraw_notice">
 	<a href="javascript:toggleDiv('draw_options');" class="options button">Options</a>
-	<input type="submit" class="submit button" value="Refresh" />
+	<input type="submit" class="submit button" value="Next Idea" />
 	</form>
 </div>
+<div class="share">Please tag your images with #ysdidea so that I can find them!</div>
+<div class="details">Developed by <a href="https://www.peralty.com">Malcolm Peralty</a></div>
 </body>
 </html>
