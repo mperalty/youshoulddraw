@@ -5,9 +5,9 @@
 
 //DB CONNECTION
 $servername = "localhost";
-$username = "secondcl_drawing";
-$password = "t!klm90#A21!";
-$dbname = "secondcl_ushoulddraw";
+$username = "";
+$password = "";
+$dbname = "";
 
 // Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);
