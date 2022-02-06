@@ -8,7 +8,7 @@ if($_POST){
 	$accessories = $_POST['accessories'];
 }
 	
-	require_once "/includes/dbcon.php";
+	require "includes/dbcon.php";
 	
 	// Create connection
 	$conn = new mysqli($servername, $username, $password, $dbname);
