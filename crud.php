@@ -4,10 +4,7 @@
 //PASSWORD CHECK
 
 //DB CONNECTION
-$servername = "localhost";
-$username = "secondcl_drawing";
-$password = "t!klm90#A21!";
-$dbname = "secondcl_ushoulddraw";
+require_once "/includes/dbcon.php";
 
 // Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);
@@ -36,7 +33,12 @@ if (!empty($_POST)) {
 	$name = $_POST["elementname"];
 	$type = $_POST["elementtype"];
 	$password = $_POST["elementpassword"];
-	if ($password == "h4rvest"){
+	
+	// Select password hash for admin from database
+	$sqlpasscheck = "SELECT password FROM adminuser;";
+	$passfromdb = $conn->query($sqlpasscheck);
+	
+	if (password_verify($password, $passfromdb)){
 		$sqladdnew = "INSERT INTO drawoptions (id, name, type) VALUES ('', '$name', '$type');";
 
 		if ($conn->query($sqladdnew) === TRUE) {
