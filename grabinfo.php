@@ -169,5 +169,5 @@ $stmt = $pdo->prepare("INSERT INTO generated_prompts (base_class_id, major_featu
 $stmt->execute([$baseclass['id'], $majorfeature['id'], $acc1, $acc2, $acc3, $emotion_id, $pet_id, $prompt]);
 $share_id = $pdo->lastInsertId();
 
-echo htmlspecialchars($prompt) . '<br /><a href="share.php?id=' . $share_id . '">Share this prompt</a>';
+echo htmlspecialchars($prompt) . '<br /><a href="share/' . $share_id . '">Share this prompt</a>';
 

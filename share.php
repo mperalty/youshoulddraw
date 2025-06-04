@@ -21,6 +21,12 @@ if (function_exists('getPDO')) {
 }
 $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
+if (!$id && isset($_SERVER['REQUEST_URI'])) {
+    $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+    if (preg_match('#/share/([0-9]+)#', $path, $m)) {
+        $id = (int)$m[1];
+    }
+}
 $stmt = $pdo->prepare('SELECT prompt FROM generated_prompts WHERE id = ?');
 $stmt->execute([$id]);
 $prompt = $stmt->fetchColumn();
