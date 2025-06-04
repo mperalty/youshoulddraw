@@ -7,24 +7,37 @@ session_start();
 //PASSWORD CHECK
 
 //DB CONNECTION
-require "includes/dbcon.php";
+$config = __DIR__ . '/includes/dbcon.php';
+if (file_exists($config)) {
+    require $config;
+}
 
-// Create connection
-$conn = new mysqli($servername, $username, $password, $dbname);
-// Check connection
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-} 
+if (function_exists('getPDO')) {
+    $pdo = getPDO();
+} else {
+    $type = getenv('YSD_DB_TYPE') ?: 'mysql';
+    if ($type === 'sqlite') {
+        $path = getenv('YSD_DB_PATH') ?: __DIR__ . '/ysd.sqlite';
+        $pdo = new PDO('sqlite:' . $path);
+    } else {
+        $host = getenv('YSD_DB_HOST') ?: 'localhost';
+        $user = getenv('YSD_DB_USER');
+        $pass = getenv('YSD_DB_PASS');
+        $dbname = getenv('YSD_DB_NAME');
+        $dsn = "mysql:host=$host;dbname=$dbname;charset=utf8mb4";
+        $pdo = new PDO($dsn, $user, $pass);
+    }
+}
+$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
 //DISPLAY VALUES
 
-$currdbsql = "SELECT name,type FROM drawoptions;";
-$currdbresult = $conn->query($currdbsql);
-
-if ($currdbresult->num_rows > 0) {
-     // output data of each row
-     while($row = $currdbresult->fetch_assoc()) {
-         echo htmlspecialchars($row["name"]) . " - " . htmlspecialchars($row["type"]) . "<br />";
+$currdbsql = "SELECT name,type FROM drawoptions";
+$stmt = $pdo->query($currdbsql);
+$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+if ($rows) {
+     foreach ($rows as $row) {
+         echo htmlspecialchars($row['name']) . " - " . htmlspecialchars($row['type']) . "<br />";
      }
 } else {
      echo "Zero results";
@@ -52,35 +65,29 @@ if (!empty($_POST)) {
         }
 	$passfromdb = '';
 	
-	// Select password hash for admin from database
-	$sqlpasscheck = "SELECT password FROM adminuser;";
-	$passresults = $conn->query($sqlpasscheck);
-	
-	if ($passresults->num_rows > 0) {
-		while($row = $passresults->fetch_assoc()) {
-			$passfromdb = $row["password"];
-		}
-	}
+        // Select password hash for admin from database
+        $sqlpasscheck = "SELECT password FROM adminuser";
+        $passresults = $pdo->query($sqlpasscheck);
+        $row = $passresults->fetch(PDO::FETCH_ASSOC);
+        if ($row) {
+                $passfromdb = $row['password'];
+        }
 	
 	if ( password_verify($password, $passfromdb) || isset($_SESSION["loginaccepted"]) ){
 
 		$_SESSION["loginaccepted"] = "true";
 		
-                $stmt = $conn->prepare("INSERT INTO drawoptions (name, type) VALUES (?, ?)");
-                $stmt->bind_param("ss", $name, $type);
-
-                if ($stmt->execute()) {
+                $stmt = $pdo->prepare("INSERT INTO drawoptions (name, type) VALUES (:name, :type)");
+                if ($stmt->execute([':name' => $name, ':type' => $type])) {
                         echo "New record created successfully";
                 } else {
-                        echo "Error: " . $stmt->error;
+                        echo "Error: " . implode(' ', $stmt->errorInfo());
                 }
-                $stmt->close();
 	} else {
 		echo "Wrong password.";
 	}
 }
 
-$conn->close();
 ?>
 <!DOCTYPE html>
 <html>
