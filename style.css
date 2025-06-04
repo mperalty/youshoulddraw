@@ -80,6 +80,45 @@ h3 {
 	margin-top: 12px;
 }
 
-.details a { 
-	color: #333;
+.details a {
+        color: #333;
+}
+
+.hidden {
+        display: none;
+}
+
+#idea_history {
+        width: 80%;
+        margin: 10px auto;
+        padding: 0;
+}
+
+#idea_history li {
+        background: #fff;
+        border: 1px solid #ccc;
+        padding: 5px 10px;
+        margin: 5px 0;
+        list-style: none;
+}
+
+@media (max-width: 600px) {
+        h3,
+        #idea_history,
+        #draw_options {
+                width: 95%;
+        }
+
+        #draw_options .left_side,
+        #draw_options .right_side {
+                width: 100%;
+                display: block;
+        }
+
+        .options,
+        .submit {
+                display: block;
+                width: 100%;
+                margin-bottom: 10px;
+        }
 }
