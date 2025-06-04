@@ -13,47 +13,55 @@
     <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
   <![endif]-->
 
-<script src="jquery-3.6.0.min.js"></script>
 <script type="text/javascript">
 function toggleDiv(divId) {
-   $("#"+divId).slideToggle( "slow" );
+  const el = document.getElementById(divId);
+  if (window.getComputedStyle(el).display === 'none') {
+    el.style.display = 'block';
+  } else {
+    el.style.display = 'none';
+  }
 }
+
+function addToHistory(text) {
+  const list = document.getElementById('idea_history');
+  const li = document.createElement('li');
+  li.innerHTML = text;
+  list.prepend(li);
+}
+
+function fetchIdea(formData) {
+  fetch('grabinfo.php', {
+    method: 'POST',
+    body: formData
+  })
+  .then(res => res.text())
+  .then(data => {
+    const main = document.querySelector('.main');
+    if (main.innerHTML.trim() !== '') {
+      addToHistory(main.innerHTML);
+    }
+    main.innerHTML = data;
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  const fd = new FormData();
+  fd.append('firstload', '1');
+  fetchIdea(fd);
+
+  document.getElementById('optionsform').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const formData = new FormData(this);
+    fetchIdea(formData);
+  });
+});
 </script>
 
 </head>
 <body>
-<script type="text/javascript">
-$(document).ready(function() {
-	
-	$.ajax({
-		type : 'POST',
-		url : 'grabinfo.php',
-		data : "firstload",
-		success : function(data){
-			$(".main").fadeIn(500).show(function(){
-        			$(".main").html(data);
-       			});
- 			}
-	});
-	
-	 $(document).on('submit', '#optionsform', function() {
-		 var data = $(this).serialize();
-		 $.ajax({
-  
- 		type : 'POST',
-  		url  : 'grabinfo.php',
-  		data : data,
-  		success :  function(data){
-       			$(".main").fadeIn(500).show(function(){
-        			$(".main").html(data);
-       			});
- 			}
-  		});
-  		 	return false;
-	});
-});
-</script>
 <h3 class="main"></h3>
+<ul id="idea_history"></ul>
 
 <div id="draw_options">
 <form method="post" id="optionsform" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
