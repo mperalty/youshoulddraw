@@ -50,6 +50,10 @@ The optional `theme` column lets you group options into sets (for example `Sci-F
 ALTER TABLE `drawoptions` ADD `theme` varchar(50) DEFAULT NULL;
 ```
 
+A SQL dump containing this schema along with a few starter rows can be found at
+`includes/sample.sql`. Importing this file will set up the tables and populate
+them with some example options and an admin account whose password is `admin`.
+
 ## Database Connection
 
 Create a file `includes/dbcon.php` in the project root that provides a `getPDO()` function returning a PDO connection. For a MySQL setup:
