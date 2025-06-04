@@ -42,9 +42,43 @@ if (!$prompt) {
   <meta charset="utf-8">
   <title>You Should Draw - Shared Prompt</title>
   <link rel="stylesheet" href="style.css">
+  <script type="text/javascript">
+    function setTheme(isDark){
+      document.body.classList.toggle('dark', isDark);
+      document.getElementById('themeToggle').textContent = isDark ? '☀️' : '🌙';
+      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    }
+    function applySavedTheme(){
+      const saved = localStorage.getItem('theme');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      setTheme(saved === 'dark' || (!saved && prefersDark));
+    }
+    function setLargeText(isLarge){
+      document.body.classList.toggle('large-text', isLarge);
+      document.getElementById('fontToggle').textContent = isLarge ? 'A-' : 'A+';
+      localStorage.setItem('largeText', isLarge ? 'yes' : 'no');
+    }
+    function applySavedFont(){
+      const saved = localStorage.getItem('largeText');
+      setLargeText(saved === 'yes');
+    }
+    document.addEventListener('DOMContentLoaded', function(){
+      applySavedTheme();
+      applySavedFont();
+      document.getElementById('themeToggle').addEventListener('click', function(){
+        setTheme(!document.body.classList.contains('dark'));
+      });
+      document.getElementById('fontToggle').addEventListener('click', function(){
+        setLargeText(!document.body.classList.contains('large-text'));
+      });
+    });
+  </script>
 </head>
 <body>
-<h3 class="main"><?php echo htmlspecialchars($prompt); ?></h3>
+<a href="#maincontent" class="skip-link">Skip to content</a>
+<button id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+<button id="fontToggle" aria-label="Toggle large text">A+</button>
+<h3 id="maincontent" class="main" aria-live="polite"><?php echo htmlspecialchars($prompt); ?></h3>
 <div class="share"><a href="index.php">Generate your own idea</a></div>
 </body>
 </html>

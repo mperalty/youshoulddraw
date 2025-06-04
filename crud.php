@@ -100,9 +100,31 @@ if (!empty($_POST)) {
 ?>
 <!DOCTYPE html>
 <html>
+<head>
+<link rel="stylesheet" href="style.css">
+<script type="text/javascript">
+function setLargeText(isLarge){
+    document.body.classList.toggle('large-text', isLarge);
+    document.getElementById('fontToggle').textContent = isLarge ? 'A-' : 'A+';
+    localStorage.setItem('largeText', isLarge ? 'yes' : 'no');
+}
+function applySavedFont(){
+    const saved = localStorage.getItem('largeText');
+    setLargeText(saved === 'yes');
+}
+document.addEventListener('DOMContentLoaded',function(){
+    applySavedFont();
+    document.getElementById('fontToggle').addEventListener('click',function(){
+        setLargeText(!document.body.classList.contains('large-text'));
+    });
+});
+</script>
+</head>
 <body>
+<a href="#maincontent" class="skip-link">Skip to content</a>
+<button id="fontToggle" aria-label="Toggle large text">A+</button>
 
-<form method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
+<form id="maincontent" method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
 Element Name: <input name="elementname" type="text" id="ename"><br />
 Element Type: <select name="elementtype" type="text" id="etype">
                                 <option value="Base Class">Base Class</option>
