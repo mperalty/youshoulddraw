@@ -36,8 +36,8 @@ $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 $driver = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
 $rand = ($driver === 'sqlite') ? 'RANDOM()' : 'RAND()';
 
-function randomName($pdo, $type, $theme, $rand) {
-    $query = "SELECT name FROM drawoptions WHERE type = :type";
+function randomRow($pdo, $type, $theme, $rand) {
+    $query = "SELECT id, name FROM drawoptions WHERE type = :type";
     $params = [':type' => $type];
     if (!empty($theme)) {
         $query .= " AND theme = :theme";
@@ -46,16 +46,16 @@ function randomName($pdo, $type, $theme, $rand) {
     $query .= " ORDER BY $rand LIMIT 1";
     $stmt = $pdo->prepare($query);
     $stmt->execute($params);
-    return $stmt->fetchColumn();
+    return $stmt->fetch(PDO::FETCH_ASSOC);
 }
 
-$baseclass_output = randomName($pdo, 'Base Class', $theme, $rand);
-$majorfeature_output = randomName($pdo, 'Major Feature', $theme, $rand);
+$baseclass = randomRow($pdo, 'Base Class', $theme, $rand);
+$majorfeature = randomRow($pdo, 'Major Feature', $theme, $rand);
 
 if (!$accessories) {
     $accessories = 1;
 }
-$query = "SELECT name FROM drawoptions WHERE type = 'Accessories'";
+$query = "SELECT id, name FROM drawoptions WHERE type = 'Accessories'";
 $params = [];
 if (!empty($theme)) {
     $query .= " AND theme = :theme";
@@ -68,14 +68,14 @@ foreach ($params as $k => $v) {
     $stmt->bindValue($k, $v);
 }
 $stmt->execute();
-$accessory_output = $stmt->fetchAll(PDO::FETCH_COLUMN);
+$accessories_rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 if (isset($emotion)) {
-    $emotion_output = randomName($pdo, 'Emotion', $theme, $rand);
+    $emotion_row = randomRow($pdo, 'Emotion', $theme, $rand);
 }
 
 if (isset($pet)) {
-    $pet_output = randomName($pdo, 'Pet', $theme, $rand);
+    $pet_row = randomRow($pdo, 'Pet', $theme, $rand);
 }
 
 $vowels = ['A','E','I','O','U'];
@@ -85,12 +85,12 @@ function articleFor($word, $vowels){
 
 $prompt = 'You should draw ';
 if (isset($emotion)) {
-    $prompt .= articleFor($emotion_output, $vowels) . $emotion_output . ' ';
+    $prompt .= articleFor($emotion_row['name'], $vowels) . $emotion_row['name'] . ' ';
 }
 if (!isset($emotion)) {
-    $prompt .= articleFor($majorfeature_output, $vowels);
+    $prompt .= articleFor($majorfeature['name'], $vowels);
 }
-$prompt .= $majorfeature_output . ' ';
+$prompt .= $majorfeature['name'] . ' ';
 if (isset($gender)) {
     $values = ['Male', 'Female', 'Androgynous'];
     $weights = [49, 47, 2];
@@ -105,26 +105,37 @@ if (isset($gender)) {
     }
     $prompt .= $gender_output . ' ';
 }
-$prompt .= $baseclass_output . ' with ';
-for ($i=0; $i<count($accessory_output); $i++) {
+$prompt .= $baseclass['name'] . ' with ';
+for ($i=0; $i<count($accessories_rows); $i++) {
     if ($i>0) {
-        if ($i == count($accessory_output)-1) {
-            $prompt .= (count($accessory_output)>2 ? ', and ' : ' and ');
+        if ($i == count($accessories_rows)-1) {
+            $prompt .= (count($accessories_rows)>2 ? ', and ' : ' and ');
         } else {
             $prompt .= ', ';
         }
     }
-    if (substr($accessory_output[$i], -1) != 's') {
-        $prompt .= articleFor($accessory_output[$i], $vowels);
+    if (substr($accessories_rows[$i]['name'], -1) != 's') {
+        $prompt .= articleFor($accessories_rows[$i]['name'], $vowels);
     }
-    $prompt .= $accessory_output[$i];
+    $prompt .= $accessories_rows[$i]['name'];
 }
 if (isset($pet)) {
     $prompt .= ' that owns ';
-    if (substr($pet_output, -1) != 's') {
-        $prompt .= articleFor($pet_output, $vowels);
+    if (substr($pet_row['name'], -1) != 's') {
+        $prompt .= articleFor($pet_row['name'], $vowels);
     }
-    $prompt .= $pet_output;
+    $prompt .= $pet_row['name'];
 }
 
-echo json_encode(['prompt' => $prompt]);
+// store IDs of selected options
+$acc1 = $accessories_rows[0]['id'] ?? null;
+$acc2 = $accessories_rows[1]['id'] ?? null;
+$acc3 = $accessories_rows[2]['id'] ?? null;
+$emotion_id = isset($emotion_row) ? $emotion_row['id'] : null;
+$pet_id = isset($pet_row) ? $pet_row['id'] : null;
+$stmt = $pdo->prepare("INSERT INTO generated_prompts (base_class_id, major_feature_id, accessory1_id, accessory2_id, accessory3_id, emotion_id, pet_id, prompt) VALUES (?,?,?,?,?,?,?,?)");
+$stmt->execute([$baseclass['id'], $majorfeature['id'], $acc1, $acc2, $acc3, $emotion_id, $pet_id, $prompt]);
+$id = $pdo->lastInsertId();
+
+echo json_encode(['prompt' => $prompt, 'id' => $id]);
+
