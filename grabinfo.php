@@ -6,6 +6,7 @@ if($_POST){
         $emotion = filter_input(INPUT_POST, 'emotion', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
         $pet = filter_input(INPUT_POST, 'pet', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
         $accessories = filter_input(INPUT_POST, 'accessories', FILTER_VALIDATE_INT);
+        $theme = filter_input(INPUT_POST, 'theme', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
         if ($accessories === false || $accessories === null) {
                 echo "Invalid accessories value. Defaulting to 1.<br />";
                 $accessories = 1;
@@ -37,32 +38,70 @@ if($_POST){
         $driver = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
         $rand = ($driver === 'sqlite') ? 'RANDOM()' : 'RAND()';
 	
-        $stmt = $pdo->prepare("SELECT name FROM drawoptions WHERE type = :type ORDER BY $rand LIMIT 1");
-        $stmt->execute([':type' => 'Base Class']);
+        $query = "SELECT name FROM drawoptions WHERE type = :type";
+        $params = [':type' => 'Base Class'];
+        if (!empty($theme)) {
+                $query .= " AND theme = :theme";
+                $params[':theme'] = $theme;
+        }
+        $query .= " ORDER BY $rand LIMIT 1";
+        $stmt = $pdo->prepare($query);
+        $stmt->execute($params);
         $baseclass_output = $stmt->fetchColumn();
 
-        $stmt = $pdo->prepare("SELECT name FROM drawoptions WHERE type = :type ORDER BY $rand LIMIT 1");
-        $stmt->execute([':type' => 'Major Feature']);
+        $query = "SELECT name FROM drawoptions WHERE type = :type";
+        $params = [':type' => 'Major Feature'];
+        if (!empty($theme)) {
+                $query .= " AND theme = :theme";
+                $params[':theme'] = $theme;
+        }
+        $query .= " ORDER BY $rand LIMIT 1";
+        $stmt = $pdo->prepare($query);
+        $stmt->execute($params);
         $majorfeature_output = $stmt->fetchColumn();
 	
 	if (!$accessories){
 		$accessories = 1;
 	}
 	
-        $stmt = $pdo->prepare("SELECT name FROM drawoptions WHERE type = 'Accessories' ORDER BY $rand LIMIT :lim");
+        $query = "SELECT name FROM drawoptions WHERE type = 'Accessories'";
+        $params = [];
+        if (!empty($theme)) {
+                $query .= " AND theme = :theme";
+                $params[':theme'] = $theme;
+        }
+        $query .= " ORDER BY $rand LIMIT :lim";
+        $stmt = $pdo->prepare($query);
         $stmt->bindValue(':lim', (int)$accessories, PDO::PARAM_INT);
+        foreach ($params as $k => $v) {
+                $stmt->bindValue($k, $v);
+        }
         $stmt->execute();
         $accessory_output = $stmt->fetchAll(PDO::FETCH_COLUMN);
 	
-	if (isset($emotion)){
-                $stmt = $pdo->prepare("SELECT name FROM drawoptions WHERE type = :type ORDER BY $rand LIMIT 1");
-                $stmt->execute([':type' => 'Emotion']);
+        if (isset($emotion)){
+                $query = "SELECT name FROM drawoptions WHERE type = :type";
+                $params = [':type' => 'Emotion'];
+                if (!empty($theme)) {
+                        $query .= " AND theme = :theme";
+                        $params[':theme'] = $theme;
+                }
+                $query .= " ORDER BY $rand LIMIT 1";
+                $stmt = $pdo->prepare($query);
+                $stmt->execute($params);
                 $emotion_output = $stmt->fetchColumn();
         }
 
         if (isset($pet)){
-                $stmt = $pdo->prepare("SELECT name FROM drawoptions WHERE type = :type ORDER BY $rand LIMIT 1");
-                $stmt->execute([':type' => 'Pet']);
+                $query = "SELECT name FROM drawoptions WHERE type = :type";
+                $params = [':type' => 'Pet'];
+                if (!empty($theme)) {
+                        $query .= " AND theme = :theme";
+                        $params[':theme'] = $theme;
+                }
+                $query .= " ORDER BY $rand LIMIT 1";
+                $stmt = $pdo->prepare($query);
+                $stmt->execute($params);
                 $pet_output = $stmt->fetchColumn();
         }
 
