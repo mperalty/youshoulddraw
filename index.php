@@ -56,7 +56,7 @@ $(document).ready(function() {
 <h3 class="main"></h3>
 
 <div id="draw_options">
-<form method="post" id="optionsform" action="<?php $_PHP_SELF ?>">
+<form method="post" id="optionsform" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
 <div class="left_side"><input type="checkbox" name="gender" id="gender" value="Gender">Random Gender?<br />
 <input type="checkbox" name="emotion" id="emotion" value="Emotion">Random Emotion?<br />
 <input type="checkbox" name="pet" id="pet" value="Pet">Random Pet?</br>
