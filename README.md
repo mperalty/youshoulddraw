@@ -73,3 +73,13 @@ Environment variables (`YSD_DB_HOST`, `YSD_DB_USER`, `YSD_DB_PASS`, `YSD_DB_NAME
 3. Navigate to `http://localhost:8000/index.php` in your browser to generate drawing prompts.
 
 The administrative tool for modifying options is `crud.php` and can be accessed the same way when you need to add or change prompt choices.
+
+## API
+
+A simple JSON endpoint is available at `/api/getidea`. It accepts the same query parameters as the form on `index.php` (for example `gender`, `emotion`, `pet`, `accessories` and `theme`). The response contains a single `prompt` field:
+
+```bash
+$ curl 'http://localhost:8000/api/getidea'
+{"prompt":"You should draw ..."}
+```
+
