@@ -52,13 +52,15 @@ if (!empty($_POST)) {
 
 		$_SESSION["loginaccepted"] = "true";
 		
-		$sqladdnew = "INSERT INTO drawoptions (id, name, type) VALUES ('', '$name', '$type');";
+                $stmt = $conn->prepare("INSERT INTO drawoptions (name, type) VALUES (?, ?)");
+                $stmt->bind_param("ss", $name, $type);
 
-		if ($conn->query($sqladdnew) === TRUE) {
-    		echo "New record created successfully";
-		} else {
-    		echo "Error: " . $sqladdnew . "<br>" . $conn->error;
-		}
+                if ($stmt->execute()) {
+                        echo "New record created successfully";
+                } else {
+                        echo "Error: " . $stmt->error;
+                }
+                $stmt->close();
 	} else {
 		echo "Wrong password.";
 	}
