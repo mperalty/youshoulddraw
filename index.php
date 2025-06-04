@@ -1,3 +1,34 @@
+<?php
+$config = __DIR__ . '/includes/dbcon.php';
+if (file_exists($config)) {
+    require $config;
+}
+
+if (function_exists('getPDO')) {
+    $pdo = getPDO();
+} else {
+    $type = getenv('YSD_DB_TYPE') ?: 'mysql';
+    if ($type === 'sqlite') {
+        $path = getenv('YSD_DB_PATH') ?: __DIR__ . '/ysd.sqlite';
+        $pdo = new PDO('sqlite:' . $path);
+    } else {
+        $host = getenv('YSD_DB_HOST') ?: 'localhost';
+        $user = getenv('YSD_DB_USER');
+        $pass = getenv('YSD_DB_PASS');
+        $dbname = getenv('YSD_DB_NAME');
+        $dsn = "mysql:host=$host;dbname=$dbname;charset=utf8mb4";
+        $pdo = new PDO($dsn, $user, $pass);
+    }
+}
+$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+$themes = [];
+try {
+    $stmt = $pdo->query("SELECT DISTINCT theme FROM drawoptions WHERE theme IS NOT NULL AND theme != '' ORDER BY theme");
+    $themes = $stmt->fetchAll(PDO::FETCH_COLUMN);
+} catch (Exception $e) {
+    $themes = [];
+}
+?>
 <!doctype html>
 <html lang="en">
 <head>
@@ -86,6 +117,13 @@ document.addEventListener('DOMContentLoaded', function() {
 <div class="left_side"><input type="checkbox" name="gender" id="gender" value="Gender">Random Gender?<br />
 <input type="checkbox" name="emotion" id="emotion" value="Emotion">Random Emotion?<br />
 <input type="checkbox" name="pet" id="pet" value="Pet">Random Pet?</br>
+<label for="themeSelect">Theme:</label>
+<select name="theme" id="themeSelect">
+<option value="">Any Theme</option>
+<?php foreach ($themes as $t): ?>
+<option value="<?php echo htmlspecialchars($t); ?>"><?php echo htmlspecialchars($t); ?></option>
+<?php endforeach; ?>
+</select><br />
 </div>
 <div class="right_side">
 <input type="radio" name="accessories" class="accessories" value="1" checked>One Accessory<br />

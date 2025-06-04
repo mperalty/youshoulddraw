@@ -18,6 +18,7 @@ CREATE TABLE `drawoptions` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
   `type` varchar(50) NOT NULL,
+  `theme` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`id`)
 );
 
@@ -29,6 +30,11 @@ CREATE TABLE `adminuser` (
 ```
 
 The values in `drawoptions.type` correspond to options like `Base Class`, `Major Feature`, `Accessories`, `Emotion` and `Pet`.
+The optional `theme` column lets you group options into sets (for example `Sci-Fi`, `Medieval` or `Cute`). Existing installations can add the column with:
+
+```sql
+ALTER TABLE `drawoptions` ADD `theme` varchar(50) DEFAULT NULL;
+```
 
 ## Database Connection
 

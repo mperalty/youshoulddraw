@@ -32,12 +32,16 @@ $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
 //DISPLAY VALUES
 
-$currdbsql = "SELECT name,type FROM drawoptions";
+$currdbsql = "SELECT name,type,theme FROM drawoptions";
 $stmt = $pdo->query($currdbsql);
 $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 if ($rows) {
      foreach ($rows as $row) {
-         echo htmlspecialchars($row['name']) . " - " . htmlspecialchars($row['type']) . "<br />";
+         echo htmlspecialchars($row['name']) . " - " . htmlspecialchars($row['type']);
+         if (!empty($row['theme'])) {
+             echo " (" . htmlspecialchars($row['theme']) . ")";
+         }
+         echo "<br />";
      }
 } else {
      echo "Zero results";
@@ -56,6 +60,11 @@ if (!empty($_POST)) {
         if ($type === null) {
                 $type = '';
                 echo "Invalid element type provided.<br />";
+        }
+
+        $theme = filter_input(INPUT_POST, "elementtheme", FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+        if ($theme === null) {
+                $theme = '';
         }
 
         $password = filter_input(INPUT_POST, "elementpassword", FILTER_SANITIZE_FULL_SPECIAL_CHARS);
@@ -77,8 +86,8 @@ if (!empty($_POST)) {
 
 		$_SESSION["loginaccepted"] = "true";
 		
-                $stmt = $pdo->prepare("INSERT INTO drawoptions (name, type) VALUES (:name, :type)");
-                if ($stmt->execute([':name' => $name, ':type' => $type])) {
+                $stmt = $pdo->prepare("INSERT INTO drawoptions (name, type, theme) VALUES (:name, :type, :theme)");
+                if ($stmt->execute([':name' => $name, ':type' => $type, ':theme' => $theme])) {
                         echo "New record created successfully";
                 } else {
                         echo "Error: " . implode(' ', $stmt->errorInfo());
@@ -96,13 +105,14 @@ if (!empty($_POST)) {
 <form method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
 Element Name: <input name="elementname" type="text" id="ename"><br />
 Element Type: <select name="elementtype" type="text" id="etype">
-				<option value="Base Class">Base Class</option>
-				<option value="Major Feature">Major Feature</option>
-				<option value="Accessories">Accessory</option>
-				<option value="Emotion">Emotion</option>
-				<option value="Pet">Pet</option>
-			</select>
+                                <option value="Base Class">Base Class</option>
+                                <option value="Major Feature">Major Feature</option>
+                                <option value="Accessories">Accessory</option>
+                                <option value="Emotion">Emotion</option>
+                                <option value="Pet">Pet</option>
+                        </select>
 <br />
+Theme: <input name="elementtheme" type="text" id="etheme"><br />
 <?php if ( !isset($_SESSION["loginaccepted"]) ) {?>
 Password: <input name="elementpassword" type="password" id="pw"><br />
 <?php } ?>
