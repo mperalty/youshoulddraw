@@ -2,10 +2,14 @@
 	
 //DB CONNECTION
 if($_POST){
-	$gender = $_POST['gender'];
-	$emotion = $_POST['emotion'];
-	$pet = $_POST['pet'];
-	$accessories = $_POST['accessories'];
+        $gender = filter_input(INPUT_POST, 'gender', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+        $emotion = filter_input(INPUT_POST, 'emotion', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+        $pet = filter_input(INPUT_POST, 'pet', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+        $accessories = filter_input(INPUT_POST, 'accessories', FILTER_VALIDATE_INT);
+        if ($accessories === false || $accessories === null) {
+                echo "Invalid accessories value. Defaulting to 1.<br />";
+                $accessories = 1;
+        }
 }
 	
 	require "includes/dbcon.php";
@@ -95,7 +99,7 @@ if (isset($emotion)){
 		} else { 
 			echo 'a '; 
 		} 
-	echo $emotion_output ." ";
+        echo htmlspecialchars($emotion_output) ." ";
 }
 
 if (!isset($emotion)){
@@ -105,17 +109,17 @@ if (!isset($emotion)){
 		echo 'a '; 
 	}
 }
-echo $majorfeature_output ." "; 
+echo htmlspecialchars($majorfeature_output) ." ";
 
 if (isset($gender)){
 	$values = array("Male", "Female", "Androgynous");
 	$weights = array(49, 47, 2);
 	$gender_output = weighted_random_simple($values, $weights);
 
-echo $gender_output ." ";	
+echo htmlspecialchars($gender_output) ." ";
 }
 
-echo $baseclass_output; 
+echo htmlspecialchars($baseclass_output);
 
 ?> with <?php 
 if (substr($accessory_output[0], -1) != "s"){ 
@@ -126,7 +130,7 @@ if (substr($accessory_output[0], -1) != "s"){
 		echo 'a '; 
 	}
 } 
-echo $accessory_output[0]; 
+echo htmlspecialchars($accessory_output[0]);
 
 if ($accessories > 1){ 
  
@@ -143,7 +147,7 @@ if ($accessories > 1){
 		} else { 
 			echo 'a '; 
 		}} 
-	echo $accessory_output[1]; 
+        echo htmlspecialchars($accessory_output[1]);
 }; 
 
 if ($accessories > 2){
@@ -155,7 +159,7 @@ if ($accessories > 2){
 		} else { 
 			echo 'a '; 
 		}} 
-	echo $accessory_output[2];
+        echo htmlspecialchars($accessory_output[2]);
 }
 
 if (isset($pet)){
@@ -167,6 +171,6 @@ if (isset($pet)){
 				echo 'a '; 
 			}
 		}
-	echo $pet_output;
+        echo htmlspecialchars($pet_output);
 }
 ?>
