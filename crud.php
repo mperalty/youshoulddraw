@@ -70,7 +70,7 @@ $conn->close();
 <html>
 <body>
 
-<form method="post" action="<?php $_PHP_SELF ?>">
+<form method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
 Element Name: <input name="elementname" type="text" id="ename"><br />
 Element Type: <select name="elementtype" type="text" id="etype">
 				<option value="Base Class">Base Class</option>
