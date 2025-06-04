@@ -12,66 +12,59 @@ if($_POST){
         }
 }
 	
-	require "includes/dbcon.php";
+        $config = __DIR__ . '/includes/dbcon.php';
+        if (file_exists($config)) {
+                require $config;
+        }
+
+        if (function_exists('getPDO')) {
+                $pdo = getPDO();
+        } else {
+                $type = getenv('YSD_DB_TYPE') ?: 'mysql';
+                if ($type === 'sqlite') {
+                        $path = getenv('YSD_DB_PATH') ?: __DIR__ . '/ysd.sqlite';
+                        $pdo = new PDO('sqlite:' . $path);
+                } else {
+                        $host = getenv('YSD_DB_HOST') ?: 'localhost';
+                        $user = getenv('YSD_DB_USER');
+                        $pass = getenv('YSD_DB_PASS');
+                        $dbname = getenv('YSD_DB_NAME');
+                        $dsn = "mysql:host=$host;dbname=$dbname;charset=utf8mb4";
+                        $pdo = new PDO($dsn, $user, $pass);
+                }
+        }
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $driver = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
+        $rand = ($driver === 'sqlite') ? 'RANDOM()' : 'RAND()';
 	
-	// Create connection
-	$conn = new mysqli($servername, $username, $password, $dbname);
-	// Check connection
-	if ($conn->connect_error) {
-	    die("Connection failed: " . $conn->connect_error);
-	} 
-	
-        $stmt = $conn->prepare("SELECT name FROM drawoptions WHERE type = ? ORDER BY RAND() LIMIT 1");
-        $type = 'Base Class';
-        $stmt->bind_param('s', $type);
-        $stmt->execute();
-        $stmt->bind_result($baseclass_output);
-        $stmt->fetch();
-        $stmt->close();
-	
-        $stmt = $conn->prepare("SELECT name FROM drawoptions WHERE type = ? ORDER BY RAND() LIMIT 1");
-        $type = 'Major Feature';
-        $stmt->bind_param('s', $type);
-        $stmt->execute();
-        $stmt->bind_result($majorfeature_output);
-        $stmt->fetch();
-        $stmt->close();
+        $stmt = $pdo->prepare("SELECT name FROM drawoptions WHERE type = :type ORDER BY $rand LIMIT 1");
+        $stmt->execute([':type' => 'Base Class']);
+        $baseclass_output = $stmt->fetchColumn();
+
+        $stmt = $pdo->prepare("SELECT name FROM drawoptions WHERE type = :type ORDER BY $rand LIMIT 1");
+        $stmt->execute([':type' => 'Major Feature']);
+        $majorfeature_output = $stmt->fetchColumn();
 	
 	if (!$accessories){
 		$accessories = 1;
 	}
 	
-	$i = 0;
-	
-        $stmt = $conn->prepare("SELECT name FROM drawoptions WHERE type = 'Accessories' ORDER BY RAND() LIMIT ?");
-        $stmt->bind_param('i', $accessories);
+        $stmt = $pdo->prepare("SELECT name FROM drawoptions WHERE type = 'Accessories' ORDER BY $rand LIMIT :lim");
+        $stmt->bindValue(':lim', (int)$accessories, PDO::PARAM_INT);
         $stmt->execute();
-        $stmt->bind_result($accessory_name);
-        while ($stmt->fetch()) {
-                $accessory_output[$i] = $accessory_name;
-                $i++;
-        }
-        $stmt->close();
+        $accessory_output = $stmt->fetchAll(PDO::FETCH_COLUMN);
 	
 	if (isset($emotion)){
-                $stmt = $conn->prepare("SELECT name FROM drawoptions WHERE type = ? ORDER BY RAND() LIMIT 1");
-                $type = 'Emotion';
-                $stmt->bind_param('s', $type);
-                $stmt->execute();
-                $stmt->bind_result($emotion_output);
-                $stmt->fetch();
-                $stmt->close();
-	}
-	
-	if (isset($pet)){
-                $stmt = $conn->prepare("SELECT name FROM drawoptions WHERE type = ? ORDER BY RAND() LIMIT 1");
-                $type = 'Pet';
-                $stmt->bind_param('s', $type);
-                $stmt->execute();
-                $stmt->bind_result($pet_output);
-                $stmt->fetch();
-                $stmt->close();
-	}	
+                $stmt = $pdo->prepare("SELECT name FROM drawoptions WHERE type = :type ORDER BY $rand LIMIT 1");
+                $stmt->execute([':type' => 'Emotion']);
+                $emotion_output = $stmt->fetchColumn();
+        }
+
+        if (isset($pet)){
+                $stmt = $pdo->prepare("SELECT name FROM drawoptions WHERE type = :type ORDER BY $rand LIMIT 1");
+                $stmt->execute([':type' => 'Pet']);
+                $pet_output = $stmt->fetchColumn();
+        }
 
 $vowels = array('A', 'E', 'I', 'O', 'U');  	
 	
