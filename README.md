@@ -98,7 +98,7 @@ $ curl 'http://localhost:8000/api/getidea'
 ```
 
 Each response also includes an `id` field which can be used to share the prompt:
-`share.php?id=<ID>` will display the stored text.
+`/share/<ID>` will display the stored text.
 
 ## Sharing Prompts
 
@@ -107,7 +107,7 @@ the `generated_prompts` table. The ID of the saved row is returned to the
 frontend so you can share a direct link such as:
 
 ```
-http://localhost:8000/share.php?id=123
+http://localhost:8000/share/123
 ```
 
 Opening that URL will show the exact text that was generated.
