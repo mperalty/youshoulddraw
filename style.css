@@ -1,6 +1,7 @@
 body {
-	background: #eee;
-	font: "Open Sans",Arial,sans-serif;
+        background: #eee;
+        font: "Open Sans",Arial,sans-serif;
+        color: #333;
 }
 
 h3 {
@@ -121,4 +122,45 @@ h3 {
                 width: 100%;
                 margin-bottom: 10px;
         }
+}
+
+/* Dark mode toggle button */
+#themeToggle {
+        position: fixed;
+        top: 10px;
+        right: 10px;
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+}
+
+/* Dark mode styles */
+body.dark {
+        background: #222;
+        color: #eee;
+}
+
+body.dark h3 {
+        background: #333;
+        border-color: #555;
+        color: #0bf;
+}
+
+body.dark #idea_history li {
+        background: #333;
+        border-color: #555;
+        color: #eee;
+}
+
+body.dark .button {
+        background-color: #047;
+}
+
+body.dark .details {
+        color: #ccc;
+}
+
+body.dark .details a {
+        color: #fff;
 }

@@ -45,6 +45,18 @@ function fetchIdea(formData) {
   });
 }
 
+function setTheme(isDark) {
+  document.body.classList.toggle('dark', isDark);
+  document.getElementById('themeToggle').textContent = isDark ? '☀️' : '🌙';
+  localStorage.setItem('theme', isDark ? 'dark' : 'light');
+}
+
+function applySavedTheme() {
+  const saved = localStorage.getItem('theme');
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  setTheme(saved === 'dark' || (!saved && prefersDark));
+}
+
 document.addEventListener('DOMContentLoaded', function() {
   const fd = new FormData();
   fd.append('firstload', '1');
@@ -55,11 +67,17 @@ document.addEventListener('DOMContentLoaded', function() {
     const formData = new FormData(this);
     fetchIdea(formData);
   });
+
+  applySavedTheme();
+  document.getElementById('themeToggle').addEventListener('click', function() {
+    setTheme(!document.body.classList.contains('dark'));
+  });
 });
 </script>
 
 </head>
 <body>
+<button id="themeToggle" aria-label="Toggle dark mode">🌙</button>
 <h3 class="main"></h3>
 <ul id="idea_history"></ul>
 
