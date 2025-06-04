@@ -82,6 +82,17 @@ function setTheme(isDark) {
   localStorage.setItem('theme', isDark ? 'dark' : 'light');
 }
 
+function setLargeText(isLarge) {
+  document.body.classList.toggle('large-text', isLarge);
+  document.getElementById('fontToggle').textContent = isLarge ? 'A-' : 'A+';
+  localStorage.setItem('largeText', isLarge ? 'yes' : 'no');
+}
+
+function applySavedFontSize() {
+  const saved = localStorage.getItem('largeText');
+  setLargeText(saved === 'yes');
+}
+
 function applySavedTheme() {
   const saved = localStorage.getItem('theme');
   const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -100,16 +111,22 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
   applySavedTheme();
+  applySavedFontSize();
   document.getElementById('themeToggle').addEventListener('click', function() {
     setTheme(!document.body.classList.contains('dark'));
+  });
+  document.getElementById('fontToggle').addEventListener('click', function() {
+    setLargeText(!document.body.classList.contains('large-text'));
   });
 });
 </script>
 
 </head>
 <body>
+<a href="#maincontent" class="skip-link">Skip to content</a>
 <button id="themeToggle" aria-label="Toggle dark mode">🌙</button>
-<h3 class="main"></h3>
+<button id="fontToggle" aria-label="Toggle large text">A+</button>
+<h3 id="maincontent" class="main" aria-live="polite"></h3>
 <ul id="idea_history"></ul>
 
 <div id="draw_options">
