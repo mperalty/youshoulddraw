@@ -17,17 +17,21 @@ if($_POST){
 	    die("Connection failed: " . $conn->connect_error);
 	} 
 	
-	$baseclasssql = "SELECT name FROM drawoptions where type = 'Base Class' ORDER BY RAND() LIMIT 1;";
-	$baseclass = $conn->query($baseclasssql);
-	while ($row = mysqli_fetch_assoc($baseclass)){
-		$baseclass_output = $row["name"];
-	}
+        $stmt = $conn->prepare("SELECT name FROM drawoptions WHERE type = ? ORDER BY RAND() LIMIT 1");
+        $type = 'Base Class';
+        $stmt->bind_param('s', $type);
+        $stmt->execute();
+        $stmt->bind_result($baseclass_output);
+        $stmt->fetch();
+        $stmt->close();
 	
-	$majorfeaturesql = "SELECT name FROM drawoptions where type = 'Major Feature' ORDER BY RAND() LIMIT 1;";
-	$majorfeature = $conn->query($majorfeaturesql);
-	while ($row = mysqli_fetch_assoc($majorfeature)){
-		$majorfeature_output = $row["name"];
-	}
+        $stmt = $conn->prepare("SELECT name FROM drawoptions WHERE type = ? ORDER BY RAND() LIMIT 1");
+        $type = 'Major Feature';
+        $stmt->bind_param('s', $type);
+        $stmt->execute();
+        $stmt->bind_result($majorfeature_output);
+        $stmt->fetch();
+        $stmt->close();
 	
 	if (!$accessories){
 		$accessories = 1;
@@ -35,27 +39,34 @@ if($_POST){
 	
 	$i = 0;
 	
-	$accessorysql = "SELECT name FROM drawoptions where type = 'Accessories' ORDER BY RAND() LIMIT $accessories;";
-	$accessory = $conn->query($accessorysql);
-	while ($row = mysqli_fetch_assoc($accessory)){
-		$accessory_output[$i] = $row["name"];
-		$i++;
-	}
+        $stmt = $conn->prepare("SELECT name FROM drawoptions WHERE type = 'Accessories' ORDER BY RAND() LIMIT ?");
+        $stmt->bind_param('i', $accessories);
+        $stmt->execute();
+        $stmt->bind_result($accessory_name);
+        while ($stmt->fetch()) {
+                $accessory_output[$i] = $accessory_name;
+                $i++;
+        }
+        $stmt->close();
 	
 	if (isset($emotion)){
-		$emotionsql = "SELECT name FROM drawoptions where type = 'Emotion' ORDER BY RAND() LIMIT 1;";
-		$emotion = $conn->query($emotionsql);
-		while ($row = mysqli_fetch_assoc($emotion)){
-			$emotion_output = $row["name"];
-		}
+                $stmt = $conn->prepare("SELECT name FROM drawoptions WHERE type = ? ORDER BY RAND() LIMIT 1");
+                $type = 'Emotion';
+                $stmt->bind_param('s', $type);
+                $stmt->execute();
+                $stmt->bind_result($emotion_output);
+                $stmt->fetch();
+                $stmt->close();
 	}
 	
 	if (isset($pet)){
-		$petsql = "SELECT name FROM drawoptions where type = 'Pet' ORDER BY RAND() LIMIT 1;";
-		$pet = $conn->query($petsql);
-		while ($row = mysqli_fetch_assoc($pet)){
-			$pet_output = $row["name"];
-		}
+                $stmt = $conn->prepare("SELECT name FROM drawoptions WHERE type = ? ORDER BY RAND() LIMIT 1");
+                $type = 'Pet';
+                $stmt->bind_param('s', $type);
+                $stmt->execute();
+                $stmt->bind_result($pet_output);
+                $stmt->fetch();
+                $stmt->close();
 	}	
 
 $vowels = array('A', 'E', 'I', 'O', 'U');  	
