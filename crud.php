@@ -24,7 +24,7 @@ $currdbresult = $conn->query($currdbsql);
 if ($currdbresult->num_rows > 0) {
      // output data of each row
      while($row = $currdbresult->fetch_assoc()) {
-         echo $row["name"]. " - " . $row["type"] . "<br />";
+         echo htmlspecialchars($row["name"]) . " - " . htmlspecialchars($row["type"]) . "<br />";
      }
 } else {
      echo "Zero results";
@@ -33,9 +33,23 @@ if ($currdbresult->num_rows > 0) {
 //FORM TO ADD VALUES
 
 if (!empty($_POST)) {
-	$name = $_POST["elementname"];
-	$type = $_POST["elementtype"];
-	$password = $_POST["elementpassword"];
+        $name = filter_input(INPUT_POST, "elementname", FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+        if ($name === null) {
+                $name = '';
+                echo "Invalid element name provided.<br />";
+        }
+
+        $type = filter_input(INPUT_POST, "elementtype", FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+        if ($type === null) {
+                $type = '';
+                echo "Invalid element type provided.<br />";
+        }
+
+        $password = filter_input(INPUT_POST, "elementpassword", FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+        if ($password === null) {
+                $password = '';
+                echo "Password missing.<br />";
+        }
 	$passfromdb = '';
 	
 	// Select password hash for admin from database
