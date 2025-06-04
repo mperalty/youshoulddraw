@@ -27,6 +27,20 @@ CREATE TABLE `adminuser` (
   `password` varchar(255) NOT NULL,
   PRIMARY KEY (`id`)
 );
+
+CREATE TABLE `generated_prompts` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `base_class_id` int(11) NOT NULL,
+  `major_feature_id` int(11) NOT NULL,
+  `accessory1_id` int(11) DEFAULT NULL,
+  `accessory2_id` int(11) DEFAULT NULL,
+  `accessory3_id` int(11) DEFAULT NULL,
+  `emotion_id` int(11) DEFAULT NULL,
+  `pet_id` int(11) DEFAULT NULL,
+  `prompt` text NOT NULL,
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+);
 ```
 
 The values in `drawoptions.type` correspond to options like `Base Class`, `Major Feature`, `Accessories`, `Emotion` and `Pet`.
@@ -82,4 +96,19 @@ A simple JSON endpoint is available at `/api/getidea`. It accepts the same query
 $ curl 'http://localhost:8000/api/getidea'
 {"prompt":"You should draw ..."}
 ```
+
+Each response also includes an `id` field which can be used to share the prompt:
+`share.php?id=<ID>` will display the stored text.
+
+## Sharing Prompts
+
+Whenever a prompt is generated (through the website or the API) it is stored in
+the `generated_prompts` table. The ID of the saved row is returned to the
+frontend so you can share a direct link such as:
+
+```
+http://localhost:8000/share.php?id=123
+```
+
+Opening that URL will show the exact text that was generated.
 

@@ -38,7 +38,7 @@ if($_POST){
         $driver = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
         $rand = ($driver === 'sqlite') ? 'RANDOM()' : 'RAND()';
 	
-        $query = "SELECT name FROM drawoptions WHERE type = :type";
+        $query = "SELECT id, name FROM drawoptions WHERE type = :type";
         $params = [':type' => 'Base Class'];
         if (!empty($theme)) {
                 $query .= " AND theme = :theme";
@@ -47,9 +47,9 @@ if($_POST){
         $query .= " ORDER BY $rand LIMIT 1";
         $stmt = $pdo->prepare($query);
         $stmt->execute($params);
-        $baseclass_output = $stmt->fetchColumn();
+        $baseclass = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        $query = "SELECT name FROM drawoptions WHERE type = :type";
+        $query = "SELECT id, name FROM drawoptions WHERE type = :type";
         $params = [':type' => 'Major Feature'];
         if (!empty($theme)) {
                 $query .= " AND theme = :theme";
@@ -58,13 +58,13 @@ if($_POST){
         $query .= " ORDER BY $rand LIMIT 1";
         $stmt = $pdo->prepare($query);
         $stmt->execute($params);
-        $majorfeature_output = $stmt->fetchColumn();
+        $majorfeature = $stmt->fetch(PDO::FETCH_ASSOC);
 	
 	if (!$accessories){
 		$accessories = 1;
 	}
 	
-        $query = "SELECT name FROM drawoptions WHERE type = 'Accessories'";
+        $query = "SELECT id, name FROM drawoptions WHERE type = 'Accessories'";
         $params = [];
         if (!empty($theme)) {
                 $query .= " AND theme = :theme";
@@ -77,10 +77,10 @@ if($_POST){
                 $stmt->bindValue($k, $v);
         }
         $stmt->execute();
-        $accessory_output = $stmt->fetchAll(PDO::FETCH_COLUMN);
+        $accessory_rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 	
         if (isset($emotion)){
-                $query = "SELECT name FROM drawoptions WHERE type = :type";
+                $query = "SELECT id, name FROM drawoptions WHERE type = :type";
                 $params = [':type' => 'Emotion'];
                 if (!empty($theme)) {
                         $query .= " AND theme = :theme";
@@ -89,11 +89,11 @@ if($_POST){
                 $query .= " ORDER BY $rand LIMIT 1";
                 $stmt = $pdo->prepare($query);
                 $stmt->execute($params);
-                $emotion_output = $stmt->fetchColumn();
+                $emotion_row = $stmt->fetch(PDO::FETCH_ASSOC);
         }
 
         if (isset($pet)){
-                $query = "SELECT name FROM drawoptions WHERE type = :type";
+                $query = "SELECT id, name FROM drawoptions WHERE type = :type";
                 $params = [':type' => 'Pet'];
                 if (!empty($theme)) {
                         $query .= " AND theme = :theme";
@@ -102,7 +102,7 @@ if($_POST){
                 $query .= " ORDER BY $rand LIMIT 1";
                 $stmt = $pdo->prepare($query);
                 $stmt->execute($params);
-                $pet_output = $stmt->fetchColumn();
+                $pet_row = $stmt->fetch(PDO::FETCH_ASSOC);
         }
 
 $vowels = array('A', 'E', 'I', 'O', 'U');  	
@@ -121,88 +121,53 @@ function weighted_random_simple($values, $weights){
     } 
     return $values[$i]; 
 }
-?> 
-You should draw 
-<?php 
-
-if (isset($emotion)){
-		if (in_array($emotion_output[0], $vowels)){ 
-			echo 'an '; 
-		} else { 
-			echo 'a '; 
-		} 
-        echo htmlspecialchars($emotion_output) ." ";
-}
-
-if (!isset($emotion)){
-	if (in_array($majorfeature_output[0], $vowels)){ 
-		echo 'an '; 
-	} else { 
-		echo 'a '; 
-	}
-}
-echo htmlspecialchars($majorfeature_output) ." ";
-
-if (isset($gender)){
-	$values = array("Male", "Female", "Androgynous");
-	$weights = array(49, 47, 2);
-	$gender_output = weighted_random_simple($values, $weights);
-
-echo htmlspecialchars($gender_output) ." ";
-}
-
-echo htmlspecialchars($baseclass_output);
-
-?> with <?php 
-if (substr($accessory_output[0], -1) != "s"){ 
-	$accessory1 = substr($accessory_output[0], 0, 1);
-	if (in_array($accessory1, $vowels)){ 
-		echo 'an '; 
-	} else { 
-		echo 'a '; 
-	}
-} 
-echo htmlspecialchars($accessory_output[0]);
-
-if ($accessories > 1){ 
- 
-	if ($accessories == 2){
-		echo " and ";
-	} else {
-		echo ", ";
-	}
-	
-	if (substr($accessory_output[1], -1) != "s") {
-		$accessory2 = substr($accessory_output[1], 0, 1);
-		if (in_array($accessory2, $vowels)){ 
-			echo 'an '; 
-		} else { 
-			echo 'a '; 
-		}} 
-        echo htmlspecialchars($accessory_output[1]);
-}; 
-
-if ($accessories > 2){
-	echo ", and ";
-		if (substr($accessory_output[2], -1) != "s") {
-		$accessory3 = substr($accessory_output[2], 0, 1);
-		if (in_array($accessory3, $vowels)){ 
-			echo 'an '; 
-		} else { 
-			echo 'a '; 
-		}} 
-        echo htmlspecialchars($accessory_output[2]);
-}
-
-if (isset($pet)){
-	echo " that owns ";
-		if (substr($pet_output, -1) != "s") {
-			if (in_array($pet_output[0], $vowels)){ 
-				echo 'an '; 
-			} else { 
-				echo 'a '; 
-			}
-		}
-        echo htmlspecialchars($pet_output);
-}
 ?>
+<?php
+$prompt = 'You should draw ';
+if (isset($emotion_row)) {
+    $prompt .= (in_array(strtoupper($emotion_row['name'][0]), $vowels) ? 'an ' : 'a ') . $emotion_row['name'] . ' ';
+}
+if (!isset($emotion_row)) {
+    $prompt .= (in_array(strtoupper($majorfeature['name'][0]), $vowels) ? 'an ' : 'a ');
+}
+$prompt .= $majorfeature['name'] . ' ';
+if (isset($gender)) {
+    $values = array('Male', 'Female', 'Androgynous');
+    $weights = array(49, 47, 2);
+    $gender_output = weighted_random_simple($values, $weights);
+    $prompt .= $gender_output . ' ';
+}
+$prompt .= $baseclass['name'] . ' with ';
+for ($i=0; $i<count($accessory_rows); $i++) {
+    if ($i > 0) {
+        if ($i == count($accessory_rows)-1) {
+            $prompt .= (count($accessory_rows)>2 ? ', and ' : ' and ');
+        } else {
+            $prompt .= ', ';
+        }
+    }
+    if (substr($accessory_rows[$i]['name'], -1) != 's') {
+        $prompt .= (in_array(strtoupper($accessory_rows[$i]['name'][0]), $vowels) ? 'an ' : 'a ');
+    }
+    $prompt .= $accessory_rows[$i]['name'];
+}
+if (isset($pet_row)) {
+    $prompt .= ' that owns ';
+    if (substr($pet_row['name'], -1) != 's') {
+        $prompt .= (in_array(strtoupper($pet_row['name'][0]), $vowels) ? 'an ' : 'a ');
+    }
+    $prompt .= $pet_row['name'];
+}
+
+// store IDs
+$acc1 = $accessory_rows[0]['id'] ?? null;
+$acc2 = $accessory_rows[1]['id'] ?? null;
+$acc3 = $accessory_rows[2]['id'] ?? null;
+$emotion_id = $emotion_row['id'] ?? null;
+$pet_id = $pet_row['id'] ?? null;
+$stmt = $pdo->prepare("INSERT INTO generated_prompts (base_class_id, major_feature_id, accessory1_id, accessory2_id, accessory3_id, emotion_id, pet_id, prompt) VALUES (?,?,?,?,?,?,?,?)");
+$stmt->execute([$baseclass['id'], $majorfeature['id'], $acc1, $acc2, $acc3, $emotion_id, $pet_id, $prompt]);
+$share_id = $pdo->lastInsertId();
+
+echo htmlspecialchars($prompt) . '<br /><a href="share.php?id=' . $share_id . '">Share this prompt</a>';
+
