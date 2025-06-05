@@ -52,6 +52,11 @@ function randomRow($pdo, $type, $theme, $rand) {
 $baseclass = randomRow($pdo, 'Base Class', $theme, $rand);
 $majorfeature = randomRow($pdo, 'Major Feature', $theme, $rand);
 
+if (!$baseclass || !$majorfeature) {
+    echo json_encode(['error' => 'No drawing options have been added yet.']);
+    return;
+}
+
 if (!$accessories) {
     $accessories = 1;
 }
@@ -70,12 +75,17 @@ foreach ($params as $k => $v) {
 $stmt->execute();
 $accessories_rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+if (count($accessories_rows) === 0) {
+    echo json_encode(['error' => 'No drawing options have been added yet.']);
+    return;
+}
+
 if (isset($emotion)) {
-    $emotion_row = randomRow($pdo, 'Emotion', $theme, $rand);
+    $emotion_row = randomRow($pdo, 'Emotion', $theme, $rand) ?: null;
 }
 
 if (isset($pet)) {
-    $pet_row = randomRow($pdo, 'Pet', $theme, $rand);
+    $pet_row = randomRow($pdo, 'Pet', $theme, $rand) ?: null;
 }
 
 $vowels = ['A','E','I','O','U'];
@@ -84,10 +94,10 @@ function articleFor($word, $vowels){
 }
 
 $prompt = 'You should draw ';
-if (isset($emotion)) {
+if (isset($emotion) && $emotion_row) {
     $prompt .= articleFor($emotion_row['name'], $vowels) . $emotion_row['name'] . ' ';
 }
-if (!isset($emotion)) {
+if (!isset($emotion) || !$emotion_row) {
     $prompt .= articleFor($majorfeature['name'], $vowels);
 }
 $prompt .= $majorfeature['name'] . ' ';
@@ -119,7 +129,7 @@ for ($i=0; $i<count($accessories_rows); $i++) {
     }
     $prompt .= $accessories_rows[$i]['name'];
 }
-if (isset($pet)) {
+if (isset($pet) && $pet_row) {
     $prompt .= ' that owns ';
     if (substr($pet_row['name'], -1) != 's') {
         $prompt .= articleFor($pet_row['name'], $vowels);

@@ -59,6 +59,14 @@ if($_POST){
         $stmt = $pdo->prepare($query);
         $stmt->execute($params);
         $majorfeature = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        // When the database is empty (or missing required types), we can't
+        // build a prompt. Instead of throwing notices, display a friendly
+        // message.
+        if (!$baseclass || !$majorfeature) {
+                echo 'No drawing options have been added yet.';
+                return;
+        }
 	
 	if (!$accessories){
 		$accessories = 1;
@@ -78,6 +86,11 @@ if($_POST){
         }
         $stmt->execute();
         $accessory_rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        if (count($accessory_rows) === 0) {
+                echo 'No drawing options have been added yet.';
+                return;
+        }
 	
         if (isset($emotion)){
                 $query = "SELECT id, name FROM drawoptions WHERE type = :type";
@@ -88,8 +101,8 @@ if($_POST){
                 }
                 $query .= " ORDER BY $rand LIMIT 1";
                 $stmt = $pdo->prepare($query);
-                $stmt->execute($params);
-                $emotion_row = $stmt->fetch(PDO::FETCH_ASSOC);
+        $stmt->execute($params);
+        $emotion_row = $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
         }
 
         if (isset($pet)){
@@ -101,8 +114,8 @@ if($_POST){
                 }
                 $query .= " ORDER BY $rand LIMIT 1";
                 $stmt = $pdo->prepare($query);
-                $stmt->execute($params);
-                $pet_row = $stmt->fetch(PDO::FETCH_ASSOC);
+        $stmt->execute($params);
+        $pet_row = $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
         }
 
 $vowels = array('A', 'E', 'I', 'O', 'U');  	
