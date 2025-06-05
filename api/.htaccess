@@ -1,0 +1,2 @@
+RewriteEngine On
+RewriteRule ^getidea$ getidea.php [L,QSA]
