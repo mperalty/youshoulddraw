@@ -137,10 +137,10 @@ function weighted_random_simple($values, $weights){
 ?>
 <?php
 $prompt = 'You should draw ';
-if (isset($emotion_row)) {
+if (isset($emotion) && $emotion_row) {
     $prompt .= (in_array(strtoupper($emotion_row['name'][0]), $vowels) ? 'an ' : 'a ') . $emotion_row['name'] . ' ';
 }
-if (!isset($emotion_row)) {
+if (!isset($emotion) || !$emotion_row) {
     $prompt .= (in_array(strtoupper($majorfeature['name'][0]), $vowels) ? 'an ' : 'a ');
 }
 $prompt .= $majorfeature['name'] . ' ';
@@ -164,7 +164,7 @@ for ($i=0; $i<count($accessory_rows); $i++) {
     }
     $prompt .= $accessory_rows[$i]['name'];
 }
-if (isset($pet_row)) {
+if (isset($pet) && $pet_row) {
     $prompt .= ' that owns ';
     if (substr($pet_row['name'], -1) != 's') {
         $prompt .= (in_array(strtoupper($pet_row['name'][0]), $vowels) ? 'an ' : 'a ');
