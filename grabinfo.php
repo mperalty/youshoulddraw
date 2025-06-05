@@ -174,14 +174,24 @@ if (isset($pet) && $pet_row) {
 }
 
 // store IDs
+
 $acc1 = $accessory_rows[0]['id'] ?? null;
 $acc2 = $accessory_rows[1]['id'] ?? null;
 $acc3 = $accessory_rows[2]['id'] ?? null;
 $emotion_id = $emotion_row['id'] ?? null;
 $pet_id = $pet_row['id'] ?? null;
-$stmt = $pdo->prepare("INSERT INTO generated_prompts (base_class_id, major_feature_id, accessory1_id, accessory2_id, accessory3_id, emotion_id, pet_id, prompt) VALUES (?,?,?,?,?,?,?,?)");
-$stmt->execute([$baseclass['id'], $majorfeature['id'], $acc1, $acc2, $acc3, $emotion_id, $pet_id, $prompt]);
-$share_id = $pdo->lastInsertId();
+
+// Reuse an existing prompt entry if the text matches
+$stmt = $pdo->prepare('SELECT id FROM generated_prompts WHERE prompt = ? LIMIT 1');
+$stmt->execute([$prompt]);
+$existingId = $stmt->fetchColumn();
+if ($existingId) {
+    $share_id = $existingId;
+} else {
+    $stmt = $pdo->prepare("INSERT INTO generated_prompts (base_class_id, major_feature_id, accessory1_id, accessory2_id, accessory3_id, emotion_id, pet_id, prompt) VALUES (?,?,?,?,?,?,?,?)");
+    $stmt->execute([$baseclass['id'], $majorfeature['id'], $acc1, $acc2, $acc3, $emotion_id, $pet_id, $prompt]);
+    $share_id = $pdo->lastInsertId();
+}
 
 echo htmlspecialchars($prompt) . '<br /><a href="share/' . $share_id . '">Share this prompt</a>';
 
