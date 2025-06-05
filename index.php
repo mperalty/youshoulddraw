@@ -37,7 +37,7 @@ try {
   <meta name="description" content="You Should Draw - Random Character Art Ideas Generator">
   <meta name="author" content="Malcolm Peralty">
 
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="/style.css">
   <link rel='stylesheet' id='open-sans-css'  href='//fonts.googleapis.com/css?family=Open+Sans%3A300italic%2C400italic%2C600italic%2C300%2C400%2C600&#038;subset=latin%2Clatin-ext&#038;ver=4.5.2' type='text/css' media='all' />
 
   <!--[if lt IE 9]>
