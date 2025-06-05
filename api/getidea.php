@@ -143,9 +143,18 @@ $acc2 = $accessories_rows[1]['id'] ?? null;
 $acc3 = $accessories_rows[2]['id'] ?? null;
 $emotion_id = isset($emotion_row) ? $emotion_row['id'] : null;
 $pet_id = isset($pet_row) ? $pet_row['id'] : null;
-$stmt = $pdo->prepare("INSERT INTO generated_prompts (base_class_id, major_feature_id, accessory1_id, accessory2_id, accessory3_id, emotion_id, pet_id, prompt) VALUES (?,?,?,?,?,?,?,?)");
-$stmt->execute([$baseclass['id'], $majorfeature['id'], $acc1, $acc2, $acc3, $emotion_id, $pet_id, $prompt]);
-$id = $pdo->lastInsertId();
+
+// Check if this exact prompt already exists and reuse the ID if so
+$stmt = $pdo->prepare('SELECT id FROM generated_prompts WHERE prompt = ? LIMIT 1');
+$stmt->execute([$prompt]);
+$existingId = $stmt->fetchColumn();
+if ($existingId) {
+    $id = $existingId;
+} else {
+    $stmt = $pdo->prepare("INSERT INTO generated_prompts (base_class_id, major_feature_id, accessory1_id, accessory2_id, accessory3_id, emotion_id, pet_id, prompt) VALUES (?,?,?,?,?,?,?,?)");
+    $stmt->execute([$baseclass['id'], $majorfeature['id'], $acc1, $acc2, $acc3, $emotion_id, $pet_id, $prompt]);
+    $id = $pdo->lastInsertId();
+}
 
 echo json_encode(['prompt' => $prompt, 'id' => $id]);
 

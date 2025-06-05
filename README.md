@@ -107,8 +107,9 @@ Each response also includes an `id` field which can be used to share the prompt:
 ## Sharing Prompts
 
 Whenever a prompt is generated (through the website or the API) it is stored in
-the `generated_prompts` table. The ID of the saved row is returned to the
-frontend so you can share a direct link such as:
+the `generated_prompts` table. If the exact text already exists the previous
+record is reused, otherwise a new row is created. The returned ID lets you share
+a direct link such as:
 
 ```
 http://localhost:8000/share/123
