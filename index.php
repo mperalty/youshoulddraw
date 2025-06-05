@@ -45,6 +45,7 @@ try {
   <![endif]-->
 
 <script type="text/javascript">
+let historyItems = [];
 function toggleDiv(divId) {
   const el = document.getElementById(divId);
   if (window.getComputedStyle(el).display === 'none') {
@@ -55,10 +56,24 @@ function toggleDiv(divId) {
 }
 
 function addToHistory(text) {
+  historyItems.unshift(text);
+  historyItems = historyItems.slice(0, 5);
+
+  const summary = document.getElementById('history_summary');
   const list = document.getElementById('idea_history');
-  const li = document.createElement('li');
-  li.innerHTML = text;
-  list.prepend(li);
+  list.innerHTML = '';
+
+  if (historyItems.length > 0) {
+    summary.innerHTML = historyItems[0];
+    historyItems.slice(1).forEach(item => {
+      const li = document.createElement('li');
+      li.innerHTML = item;
+      list.appendChild(li);
+    });
+    document.getElementById('history_details').style.display = 'block';
+  } else {
+    document.getElementById('history_details').style.display = 'none';
+  }
 }
 
 function fetchIdea(formData) {
@@ -127,7 +142,10 @@ document.addEventListener('DOMContentLoaded', function() {
 <button id="themeToggle" aria-label="Toggle dark mode">🌙</button>
 <button id="fontToggle" aria-label="Toggle large text">A+</button>
 <h3 id="maincontent" class="main" aria-live="polite"></h3>
-<ul id="idea_history"></ul>
+<details id="history_details" style="display:none;">
+  <summary id="history_summary"></summary>
+  <ul id="idea_history"></ul>
+</details>
 
 <div id="draw_options">
 <form method="post" id="optionsform" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">

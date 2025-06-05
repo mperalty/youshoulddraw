@@ -110,6 +110,19 @@ select:focus {
         margin: 10px auto;
         padding: 0;
 }
+#history_details {
+        width: 80%;
+        margin: 10px auto;
+}
+
+#history_details summary {
+        background: #fff;
+        border: 1px solid #ccc;
+        padding: 5px 10px;
+        margin-bottom: 5px;
+        cursor: pointer;
+        list-style: none;
+}
 
 #idea_history li {
         background: #fff;
@@ -122,7 +135,8 @@ select:focus {
 @media (max-width: 600px) {
         h3,
         #idea_history,
-        #draw_options {
+        #draw_options,
+        #history_details {
                 width: 95%;
         }
 
@@ -175,6 +189,11 @@ body.dark h3 {
 }
 
 body.dark #idea_history li {
+        background: #333;
+        border-color: #555;
+        color: #eee;
+}
+body.dark #history_details summary {
         background: #333;
         border-color: #555;
         color: #eee;
