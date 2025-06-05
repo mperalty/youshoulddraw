@@ -8,7 +8,8 @@ if($_POST){
         $accessories = filter_input(INPUT_POST, 'accessories', FILTER_VALIDATE_INT);
         $theme = filter_input(INPUT_POST, 'theme', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
         if ($accessories === false || $accessories === null) {
-                echo "Invalid accessories value. Defaulting to 1.<br />";
+                // Default to one accessory when no valid value is provided.
+                // Silently correct the value instead of displaying an error to the user.
                 $accessories = 1;
         }
 }
