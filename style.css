@@ -225,3 +225,30 @@ body.dark .details a {
         left: 10px;
         top: 10px;
 }
+
+/* CRUD table styles */
+.crud-form {
+    width: 80%;
+    margin: 20px auto;
+    background: #fff;
+    border: 1px solid #ccc;
+    padding: 10px;
+}
+.crud-table {
+    width: 80%;
+    margin: 20px auto;
+    border-collapse: collapse;
+    background: #fff;
+}
+.crud-table th, .crud-table td {
+    border: 1px solid #ccc;
+    padding: 8px;
+    text-align: left;
+}
+.crud-table th {
+    background: #eee;
+}
+.crud-actions form {
+    display: inline;
+}
+
