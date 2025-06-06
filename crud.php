@@ -90,7 +90,10 @@ if ($editId) {
     }
 }
 
-$stmt = $pdo->query('SELECT id, name, type, theme FROM drawoptions ORDER BY id');
+$allowedSort = ['name', 'type', 'theme'];
+$sort = filter_input(INPUT_GET, 'sort', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+$orderBy = in_array($sort, $allowedSort, true) ? $sort : 'id';
+$stmt = $pdo->query('SELECT id, name, type, theme FROM drawoptions ORDER BY ' . $orderBy);
 $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
@@ -130,7 +133,7 @@ document.addEventListener('DOMContentLoaded',function(){
 <p class="crud-form" style="color:red;"><?= htmlspecialchars($message); ?></p>
 <?php endif; ?>
 
-<form id="maincontent" class="crud-form" method="post" action="<?= htmlspecialchars($_SERVER['PHP_SELF']); ?>">
+<form id="maincontent" class="crud-form" method="post" action="<?= htmlspecialchars($_SERVER['PHP_SELF']) . ($sort ? '?sort=' . urlencode($sort) : ''); ?>">
     <?php if ($editRow): ?>
     <input type="hidden" name="edit_id" value="<?= $editRow['id']; ?>">
     <?php endif; ?>
@@ -152,13 +155,18 @@ document.addEventListener('DOMContentLoaded',function(){
     <?php endif; ?>
     <button type="submit"><?= $editRow ? 'Update' : 'Add'; ?></button>
     <?php if ($editRow): ?>
-    <a href="crud.php">Cancel</a>
+    <a href="crud.php<?= $sort ? '?sort=' . urlencode($sort) : ''; ?>">Cancel</a>
     <?php endif; ?>
 </form>
 
 <table class="crud-table">
 <thead>
-<tr><th>Name</th><th>Type</th><th>Theme</th><th>Actions</th></tr>
+<tr>
+<th><a href="?sort=name">Name</a></th>
+<th><a href="?sort=type">Type</a></th>
+<th><a href="?sort=theme">Theme</a></th>
+<th>Actions</th>
+</tr>
 </thead>
 <tbody>
 <?php foreach ($rows as $row): ?>
@@ -167,8 +175,8 @@ document.addEventListener('DOMContentLoaded',function(){
 <td><?= htmlspecialchars($row['type']); ?></td>
 <td><?= htmlspecialchars($row['theme']); ?></td>
 <td class="crud-actions">
-    <a href="?edit=<?= $row['id']; ?>">Edit</a>
-    <form method="post" action="" onsubmit="return confirm('Delete this item?');">
+    <a href="?edit=<?= $row['id']; ?><?= $sort ? '&sort=' . urlencode($sort) : ''; ?>">Edit</a>
+    <form method="post" action="<?= $sort ? '?sort=' . urlencode($sort) : ''; ?>" onsubmit="return confirm('Delete this item?');">
         <input type="hidden" name="delete_id" value="<?= $row['id']; ?>">
         <?php if (!isset($_SESSION['loginaccepted'])): ?>
         <input type="password" name="elementpassword" placeholder="Password" required>
