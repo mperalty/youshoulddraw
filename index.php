@@ -64,7 +64,7 @@ function addToHistory(text) {
   list.innerHTML = '';
 
   if (historyItems.length > 0) {
-    summary.innerHTML = historyItems[0];
+    summary.innerHTML = historyItems[0] + ' <span class="history-arrow">&#x25BC;</span>';
     historyItems.slice(1).forEach(item => {
       const li = document.createElement('li');
       li.innerHTML = item;
