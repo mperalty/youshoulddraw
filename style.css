@@ -1,23 +1,24 @@
 body {
-        background: #eee;
-        font: "Open Sans",Arial,sans-serif;
-        color: #333;
+        background-color: #f8f9fa; /* Updated */
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"; /* Updated */
+        color: #212529; /* Updated */
+        font-size: 16px; /* Explicitly set base font size for better control with large-text mode */
 }
 
 /* Large text mode for visually impaired users */
 body.large-text {
-        font-size: 1.25em;
+        font-size: 1.25em; /* This will now be 1.25 * 16px = 20px */
 }
 
 h3 {
 	width: 80%;
-	font: 2.0em "Open Sans",Arial,sans-serif;
+	font-size: 2.0em; /* Inherits new font-family */
 	text-align: center;
-	color: #09c;
+	color: #007bff; /* Updated to new primary color */
 	padding: 25px 15px;
 	margin: 20px auto;
-	background: #fff;
-	border: 2px solid #aaa;
+	background: #fff; /* Existing, seems fine for contrast with new body bg */
+	border: 2px solid #dee2e6; /* Lightened border */
 }
 
 #draw_options { 
@@ -33,18 +34,19 @@ h3 {
 	margin: 10px auto;
 }
 
-.subdraw_notice a {
-	color: #fff;
+.subdraw_notice a { /* This is for a link inside .subdraw_notice, usually on a colored background if any */
+	color: #fff; /* Assuming it's on a dark background, check context if used elsewhere */
 	text-decoration: none;
 }
 
 .button {
-        background-color: #09c;
+        background-color: #007bff; /* Updated */
         color: #fff;
         text-decoration: none;
         text-shadow:none;
         border:none;
         box-shadow:none;
+        border-radius: 4px; /* Added for consistency */
 }
 
 /* Keyboard focus outline */
@@ -54,18 +56,26 @@ h3 {
 a:focus,
 input:focus,
 select:focus {
-        outline: 2px dashed #555;
+        outline: 2px dashed #0056b3; /* Using a darker shade of primary for better visibility */
         outline-offset: 2px;
 }
 
-.options {
+.options { /* For select, input fields */
 	padding: 5px 10px;
-	font: 1.2em "Open Sans",Arial,sans-serif;
+	font-size: 1.2em; /* Inherits new font-family */
+    border: 1px solid #ced4da; /* Standard bootstrap-like border color */
+    border-radius: 4px;
 }
 
 .submit {
 	padding: 5px 10px;
-	font: 1.2em "Open Sans",Arial,sans-serif;
+	font-size: 1.2em; /* Inherits new font-family */
+    background-color: #007bff; /* Updated to look like a button */
+    color: #fff; /* Updated to look like a button */
+    border: none;
+    text-shadow: none;
+    box-shadow: none;
+    border-radius: 4px;
 }
 
 #draw_options .left_side {
@@ -93,12 +103,12 @@ select:focus {
 }
 
 .details {
-	color: #bbb;
+	color: #6c757d; /* Updated for new palette (slightly darker grey) */
 	margin-top: 12px;
 }
 
 .details a {
-        color: #333;
+        color: #0056b3; /* Darker shade of new primary for links */
 }
 
 .hidden {
@@ -108,10 +118,10 @@ select:focus {
 #idea_history {
         width: 80%;
         margin: 10px auto;
-        padding: 10px; /* Added padding */
-        background-color: #f9f9f9; /* Subtle background for the list */
-        border: 1px solid #ddd; /* Border for the list */
-        border-radius: 4px; /* Optional: rounded corners */
+        padding: 10px;
+        background-color: #fff; /* Keep white for contrast, or use a very light grey e.g. #e9ecef */
+        border: 1px solid #dee2e6; /* Lightened border */
+        border-radius: 4px;
 }
 #history_details {
         width: 80%;
@@ -119,33 +129,34 @@ select:focus {
 }
 
 #history_details summary {
-        background: #fff;
-        border: 1px solid #ccc;
+        background: #e9ecef; /* Light grey for summary */
+        border: 1px solid #dee2e6;
         padding: 5px 10px;
         margin-bottom: 5px;
         cursor: pointer;
         list-style: none;
         font-weight: bold;
+        border-radius: 4px;
 }
 
 #history_details summary:hover {
-        background-color: #f0f0f0;
+        background-color: #ced4da;
 }
 
 #idea_history li {
         background: #fff;
-        padding: 10px 15px; /* Increased padding */
-        margin: 0; /* Remove margin, use padding and border for spacing */
+        padding: 10px 15px;
+        margin: 0;
         list-style: none;
-        border-bottom: 1px solid #ddd; /* Bottom border for separation */
+        border-bottom: 1px solid #dee2e6; /* Lightened border */
 }
 
 #idea_history li:last-child {
-        border-bottom: none; /* Remove border from last item */
+        border-bottom: none;
 }
 
 #idea_history li:hover {
-        background-color: #e9e9e9; /* Hover effect for list items */
+        background-color: #f8f9fa; /* Very light hover for list items */
 }
 
 @media (max-width: 600px) {
@@ -169,6 +180,22 @@ select:focus {
                 margin-bottom: 10px;
         }
 }
+
+/* Prompt specific styles */
+.prompt-base-class { color: #28a745; font-weight: bold; } /* Updated green for better harmony */
+.prompt-major-feature { color: #fd7e14; } /* Updated orange */
+.prompt-accessory { color: #17a2b8; font-style: italic; } /* Updated teal/blue */
+.prompt-emotion { color: #dc3545; } /* Updated red */
+.prompt-pet { color: #ffc107; } /* Yellow - kept, good contrast */
+.prompt-gender { color: #6f42c1; } /* Updated purple */
+
+/* Social media sharing buttons */
+.social-share { margin-top: 10px; text-align: center; }
+.social-share a { display: inline-block; margin-right: 8px; padding: 8px 12px; background-color: #e9ecef; color: #212529; text-decoration: none; border-radius: 4px; }
+.social-share a:hover { background-color: #dee2e6; }
+.social-share a.twitter { background-color: #1DA1F2; color: white; }
+.social-share a.facebook { background-color: #1877F2; color: white; }
+.social-share a.pinterest { background-color: #E60023; color: white; }
 
 /* Dark mode toggle button */
 #themeToggle {
@@ -194,59 +221,87 @@ select:focus {
 
 /* Dark mode styles */
 body.dark {
-        background: #222;
-        color: #eee;
+        background-color: #343a40;
+        color: #f8f9fa;
 }
 
 body.dark h3 {
-        background: #333;
-        border-color: #555;
-        color: #0bf;
+        background: #495057;
+        border-color: #6c757d;
+        color: #17a2b8;
 }
 
 body.dark #idea_history {
-        background-color: #282828; /* Dark mode background for the list - refined */
-        border-color: #484848; /* Dark mode border for the list - refined */
+        background-color: #495057;
+        border-color: #6c757d;
 }
 
 body.dark #idea_history li {
-        background: #333;
-        border-color: #484848; /* Adjusted for consistency, will be overridden by border-bottom - refined */
-        color: #eee;
-        /* font-weight: bold; REMOVED - this was likely an error from previous merge */
-        padding: 10px 15px; /* Ensure padding matches light mode */
-        border-bottom: 1px solid #484848; /* Dark mode bottom border - refined */
+        background: #5a6268;
+        border-color: #6c757d;
+        color: #f8f9fa;
+        padding: 10px 15px;
+        border-bottom: 1px solid #6c757d;
 }
 
 body.dark #idea_history li:last-child {
-        border-bottom: none; /* Remove border from last item in dark mode */
+        border-bottom: none;
 }
 
 body.dark #idea_history li:hover {
-        background-color: #383838; /* Dark mode hover for list items */
+        background-color: #6c757d;
 }
 
-body.dark #history_details summary:hover {
-        background-color: #444; /* Darker hover for dark mode */
-}
 body.dark #history_details summary {
-        background: #333;
-        border-color: #555;
-        color: #eee;
-        font-weight: bold; /* This was correctly placed for summary, ensuring it stays */
+        background: #495057;
+        border-color: #6c757d;
+        color: #f8f9fa;
+        font-weight: bold;
+}
+body.dark #history_details summary:hover {
+        background-color: #5a6268;
 }
 
-body.dark .button {
-        background-color: #047;
+
+body.dark .button, body.dark .submit { /* Combined for consistency */
+        background-color: #0056b3;
+        color: #fff;
+}
+
+body.dark .options { /* Dark mode for form inputs/selects */
+    background-color: #495057;
+    color: #f8f9fa;
+    border-color: #6c757d;
 }
 
 body.dark .details {
-        color: #ccc;
+        color: #adb5bd;
 }
 
 body.dark .details a {
-        color: #fff;
+        color: #6cb2eb;
 }
+
+/* Dark mode adjustments for social share buttons */
+body.dark .social-share a {
+    background-color: #495057;
+    color: #f8f9fa;
+}
+body.dark .social-share a:hover {
+    background-color: #5a6268;
+}
+/* Platform-specific buttons (twitter, facebook, pinterest) retain their brand colors. */
+
+/* Dark mode for keyboard focus outline */
+body.dark .button:focus,
+body.dark #themeToggle:focus,
+body.dark #fontToggle:focus,
+body.dark a:focus,
+body.dark input:focus,
+body.dark select:focus {
+        outline: 2px dashed #6cb2eb; /* Lighter blue for dark mode focus */
+}
+
 
 /* Skip link for keyboard users */
 .skip-link {
@@ -267,25 +322,56 @@ body.dark .details a {
 .crud-form {
     width: 80%;
     margin: 20px auto;
-    background: #fff;
-    border: 1px solid #ccc;
+    background: #fff; /* Light mode */
+    border: 1px solid #dee2e6; /* Light mode */
     padding: 10px;
+    border-radius: 4px;
 }
 .crud-table {
     width: 80%;
     margin: 20px auto;
     border-collapse: collapse;
-    background: #fff;
+    background: #fff; /* Light mode */
 }
 .crud-table th, .crud-table td {
-    border: 1px solid #ccc;
+    border: 1px solid #dee2e6; /* Light mode */
     padding: 8px;
     text-align: left;
 }
 .crud-table th {
-    background: #eee;
+    background: #e9ecef; /* Light mode header */
 }
 .crud-actions form {
     display: inline;
 }
 
+/* Dark Mode for CRUD */
+body.dark .crud-form {
+    background: #495057;
+    border-color: #6c757d;
+}
+body.dark .crud-table {
+    background: #5a6268;
+    border-color: #6c757d;
+}
+body.dark .crud-table th, body.dark .crud-table td {
+    border-color: #6c757d;
+}
+body.dark .crud-table th {
+    background: #495057;
+    color: #f8f9fa;
+}
+body.dark .crud-form input[type="text"],
+body.dark .crud-form input[type="number"],
+body.dark .crud-form select,
+body.dark .crud-form textarea {
+    background-color: #343a40;
+    color: #f8f9fa;
+    border: 1px solid #6c757d;
+}
+body.dark .crud-form input[type="submit"],
+body.dark .crud-form button {
+    background-color: #0056b3;
+    color: #fff;
+    border: none;
+}

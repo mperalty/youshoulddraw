@@ -27,14 +27,124 @@ if (!$id && isset($_SERVER['REQUEST_URI'])) {
         $id = (int)$m[1];
     }
 }
-$stmt = $pdo->prepare('SELECT prompt FROM generated_prompts WHERE id = ?');
+
+// Fetch all necessary fields from generated_prompts
+$stmt = $pdo->prepare('SELECT prompt, base_class_id, major_feature_id, accessory1_id, accessory2_id, accessory3_id, emotion_id, pet_id FROM generated_prompts WHERE id = ?');
 $stmt->execute([$id]);
-$prompt = $stmt->fetchColumn();
-if (!$prompt) {
+$row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+if (!$row) {
     http_response_code(404);
     echo 'Prompt not found';
     exit;
 }
+
+$original_prompt_text = $row['prompt']; // Keep the original for reference or gender extraction
+
+// Helper function to get component name
+function getComponentName($pdo, $component_id) {
+    if (!$component_id) {
+        return null;
+    }
+    $stmt = $pdo->prepare("SELECT name FROM drawoptions WHERE id = ?");
+    $stmt->execute([$component_id]);
+    return $stmt->fetchColumn();
+}
+
+$vowels = ['A', 'E', 'I', 'O', 'U'];
+
+// Fetch names
+$emotion_name = getComponentName($pdo, $row['emotion_id']);
+$major_feature_name = getComponentName($pdo, $row['major_feature_id']);
+$base_class_name = getComponentName($pdo, $row['base_class_id']);
+$accessory1_name = getComponentName($pdo, $row['accessory1_id']);
+$accessory2_name = getComponentName($pdo, $row['accessory2_id']);
+$accessory3_name = getComponentName($pdo, $row['accessory3_id']);
+$pet_name = getComponentName($pdo, $row['pet_id']);
+
+// Reconstruct the styled prompt
+$styled_prompt_parts = [];
+$styled_prompt_parts[] = 'You should draw ';
+
+$emotion_added = false;
+if ($emotion_name) {
+    $emotion_str = (in_array(strtoupper($emotion_name[0]), $vowels) ? 'an ' : 'a ') . '<span class="prompt-emotion">' . htmlspecialchars($emotion_name) . '</span>';
+    $styled_prompt_parts[] = $emotion_str;
+    $emotion_added = true;
+}
+
+if ($major_feature_name) {
+    $prefix = '';
+    if (!$emotion_added) {
+        $prefix = (in_array(strtoupper($major_feature_name[0]), $vowels) ? 'an ' : 'a ');
+    }
+    $major_feature_str = $prefix . '<span class="prompt-major-feature">' . htmlspecialchars($major_feature_name) . '</span>';
+    $styled_prompt_parts[] = $major_feature_str;
+}
+
+// Gender extraction and styling
+if ($base_class_name) { // Need base_class_name as a reference point
+    $genders = ["Male", "Female", "Androgynous"];
+    foreach ($genders as $gender_type) {
+        // Search for " Gender BaseClassName" in the original prompt
+        // The space after gender_type is important to match "Male ", "Female ", etc.
+        $pattern = '/\b' . preg_quote($gender_type, '/') . '\s+' . preg_quote($base_class_name, '/') . '/';
+        if (preg_match($pattern, $original_prompt_text)) {
+            $gender_str = '<span class="prompt-gender">' . htmlspecialchars($gender_type) . '</span>';
+            $styled_prompt_parts[] = $gender_str;
+            break;
+        }
+    }
+}
+
+if ($base_class_name) {
+    $base_class_str = '<span class="prompt-base-class">' . htmlspecialchars($base_class_name) . '</span>';
+    $styled_prompt_parts[] = $base_class_str;
+}
+
+$accessories = array_filter([$accessory1_name, $accessory2_name, $accessory3_name]);
+if (!empty($accessories)) {
+    $styled_prompt_parts[] = 'with';
+    $accessory_html_parts = [];
+    foreach ($accessories as $acc_name) {
+        $current_accessory_html = '';
+        if (substr(htmlspecialchars($acc_name), -1) != 's') { // Check original name for 's'
+             $current_accessory_html .= (in_array(strtoupper($acc_name[0]), $vowels) ? 'an ' : 'a ');
+        }
+        $current_accessory_html .= '<span class="prompt-accessory">' . htmlspecialchars($acc_name) . '</span>';
+        $accessory_html_parts[] = $current_accessory_html;
+    }
+    // Join accessories with commas and 'and'
+    if (count($accessory_html_parts) == 1) {
+        $styled_prompt_parts[] = $accessory_html_parts[0];
+    } elseif (count($accessory_html_parts) == 2) {
+        $styled_prompt_parts[] = $accessory_html_parts[0] . ' and ' . $accessory_html_parts[1];
+    } else {
+        $last_accessory = array_pop($accessory_html_parts);
+        $styled_prompt_parts[] = implode(', ', $accessory_html_parts) . ', and ' . $last_accessory;
+    }
+}
+
+if ($pet_name) {
+    $pet_str = 'that owns ';
+    if (substr(htmlspecialchars($pet_name), -1) != 's') { // Check original name for 's'
+        $pet_str .= (in_array(strtoupper($pet_name[0]), $vowels) ? 'an ' : 'a ');
+    }
+    $pet_str .= '<span class="prompt-pet">' . htmlspecialchars($pet_name) . '</span>';
+    $styled_prompt_parts[] = $pet_str;
+}
+
+// Join all parts with a space, then clean up any potential double spaces.
+$final_styled_prompt = implode(' ', $styled_prompt_parts);
+$final_styled_prompt = preg_replace('/\s+/', ' ', $final_styled_prompt);
+$final_styled_prompt = trim($final_styled_prompt); // Trim leading/trailing spaces
+
+// If reconstruction fails or results in an empty prompt (highly unlikely if DB is consistent), fallback to original.
+if (empty($final_styled_prompt) || strlen($final_styled_prompt) < strlen("You should draw ")) {
+    // Basic fallback if reconstruction seems to have failed significantly
+    $final_styled_prompt = htmlspecialchars($original_prompt_text);
+}
+
 ?>
 <!doctype html>
 <html lang="en">
@@ -44,7 +154,6 @@ if (!$prompt) {
   <meta name="description" content="You Should Draw - Random Character Art Ideas Generator">
   <meta name="author" content="Malcolm Peralty">
   <link rel="stylesheet" href="/style.css">
-  <link rel='stylesheet' id='open-sans-css'  href='//fonts.googleapis.com/css?family=Open+Sans%3A300italic%2C400italic%2C600italic%2C300%2C400%2C600&#038;subset=latin%2Clatin-ext&#038;ver=4.5.2' type='text/css' media='all' />
   <script type="text/javascript">
     function setTheme(isDark){
       document.body.classList.toggle('dark', isDark);
@@ -81,7 +190,7 @@ if (!$prompt) {
 <a href="#maincontent" class="skip-link">Skip to content</a>
 <button id="themeToggle" aria-label="Toggle dark mode">🌙</button>
 <button id="fontToggle" aria-label="Toggle large text">A+</button>
-<h3 id="maincontent" class="main" aria-live="polite"><?php echo htmlspecialchars($prompt); ?></h3>
+<h3 id="maincontent" class="main" aria-live="polite"><?php echo $final_styled_prompt; ?></h3>
 <div class="subdraw_notice">
     <a href="/index.php" class="submit button">Generate your own idea</a>
 </div>

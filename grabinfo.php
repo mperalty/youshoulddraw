@@ -137,41 +137,124 @@ function weighted_random_simple($values, $weights){
 }
 ?>
 <?php
-$prompt = 'You should draw ';
+// --- Start Plain Text Prompt Construction ---
+$plain_text_prompt = 'You should draw ';
 if (isset($emotion) && $emotion_row) {
-    $prompt .= (in_array(strtoupper($emotion_row['name'][0]), $vowels) ? 'an ' : 'a ') . $emotion_row['name'] . ' ';
+    $plain_text_prompt .= (in_array(strtoupper($emotion_row['name'][0]), $vowels) ? 'an ' : 'a ') . $emotion_row['name'] . ' ';
 }
-if (!isset($emotion) || !$emotion_row) {
-    $prompt .= (in_array(strtoupper($majorfeature['name'][0]), $vowels) ? 'an ' : 'a ');
+if (!isset($emotion) || !$emotion_row) { // If no emotion, add 'a' or 'an' before major feature (for plain text)
+    $plain_text_prompt .= (in_array(strtoupper($majorfeature['name'][0]), $vowels) ? 'an ' : 'a ');
 }
-$prompt .= $majorfeature['name'] . ' ';
+$plain_text_prompt .= $majorfeature['name'] . ' ';
 if (isset($gender)) {
-    $values = array('Male', 'Female', 'Androgynous');
-    $weights = array(49, 47, 2);
-    $gender_output = weighted_random_simple($values, $weights);
-    $prompt .= $gender_output . ' ';
+    // Note: $gender_output is determined below for HTML prompt, we need it here for plain text too.
+    // To avoid duplicating logic, we'll use the $gender_output that will be set for the HTML version.
+    // This assumes $gender_output is set before this block if $gender is set.
+    // For safety, let's ensure $gender_output is defined if $gender is set.
+    $temp_gender_output = '';
+    if (isset($gender)) {
+        $values_gender = array('Male', 'Female', 'Androgynous'); // Renamed to avoid conflict
+        $weights_gender = array(49, 47, 2); // Renamed to avoid conflict
+        $temp_gender_output = weighted_random_simple($values_gender, $weights_gender);
+        $plain_text_prompt .= $temp_gender_output . ' ';
+    }
 }
-$prompt .= $baseclass['name'] . ' with ';
+$plain_text_prompt .= $baseclass['name'] . ' with ';
 for ($i=0; $i<count($accessory_rows); $i++) {
     if ($i > 0) {
         if ($i == count($accessory_rows)-1) {
-            $prompt .= (count($accessory_rows)>2 ? ', and ' : ' and ');
+            $plain_text_prompt .= (count($accessory_rows)>2 ? ', and ' : ' and ');
         } else {
-            $prompt .= ', ';
+            $plain_text_prompt .= ', ';
         }
     }
     if (substr($accessory_rows[$i]['name'], -1) != 's') {
-        $prompt .= (in_array(strtoupper($accessory_rows[$i]['name'][0]), $vowels) ? 'an ' : 'a ');
+        $plain_text_prompt .= (in_array(strtoupper($accessory_rows[$i]['name'][0]), $vowels) ? 'an ' : 'a ');
     }
-    $prompt .= $accessory_rows[$i]['name'];
+    $plain_text_prompt .= $accessory_rows[$i]['name'];
 }
 if (isset($pet) && $pet_row) {
-    $prompt .= ' that owns ';
+    $plain_text_prompt .= ' that owns ';
     if (substr($pet_row['name'], -1) != 's') {
-        $prompt .= (in_array(strtoupper($pet_row['name'][0]), $vowels) ? 'an ' : 'a ');
+        $plain_text_prompt .= (in_array(strtoupper($pet_row['name'][0]), $vowels) ? 'an ' : 'a ');
     }
-    $prompt .= $pet_row['name'];
+    $plain_text_prompt .= $pet_row['name'];
 }
+// --- End Plain Text Prompt Construction ---
+
+$prompt = 'You should draw '; // This is for the HTML version
+
+$emotion_html = '';
+if (isset($emotion) && $emotion_row) {
+    $emotion_name = htmlspecialchars($emotion_row['name']);
+    $emotion_html = (in_array(strtoupper($emotion_name[0]), $vowels) ? 'an ' : 'a ') . '<span class="prompt-emotion">' . $emotion_name . '</span> ';
+}
+
+$majorfeature_name = htmlspecialchars($majorfeature['name']);
+$majorfeature_html = '<span class="prompt-major-feature">' . $majorfeature_name . '</span> ';
+
+$gender_html = '';
+$gender_output_for_html = ''; // To be used if $gender is set
+if (isset($gender)) {
+    $values = array('Male', 'Female', 'Androgynous');
+    $weights = array(49, 47, 2);
+    $gender_output_for_html = weighted_random_simple($values, $weights); // Use the already defined $temp_gender_output for consistency if needed
+    // Actually, $temp_gender_output was specifically for plain text. Let's use $gender_output_for_html for HTML
+    $gender_html = '<span class="prompt-gender">' . htmlspecialchars($gender_output_for_html) . '</span> ';
+}
+
+$baseclass_name = htmlspecialchars($baseclass['name']);
+$baseclass_html = '<span class="prompt-base-class">' . $baseclass_name . '</span>';
+
+$accessories_html_array = [];
+for ($i=0; $i<count($accessory_rows); $i++) {
+    $accessory_name = htmlspecialchars($accessory_rows[$i]['name']);
+    $current_accessory_html = '';
+    if (substr($accessory_name, -1) != 's') {
+        $current_accessory_html .= (in_array(strtoupper($accessory_name[0]), $vowels) ? 'an ' : 'a ');
+    }
+    $current_accessory_html .= '<span class="prompt-accessory">' . $accessory_name . '</span>';
+    $accessories_html_array[] = $current_accessory_html;
+}
+
+$accessories_output_html = '';
+if (!empty($accessories_html_array)) {
+    $accessories_output_html .= ' with ';
+    for ($i=0; $i<count($accessories_html_array); $i++) {
+        if ($i > 0) {
+            if ($i == count($accessories_html_array)-1) {
+                $accessories_output_html .= (count($accessories_html_array)>2 ? ', and ' : ' and ');
+            } else {
+                $accessories_output_html .= ', ';
+            }
+        }
+        $accessories_output_html .= $accessories_html_array[$i];
+    }
+}
+
+$pet_html = '';
+if (isset($pet) && $pet_row) {
+    $pet_name = htmlspecialchars($pet_row['name']);
+    $pet_html = ' that owns ';
+    if (substr($pet_name, -1) != 's') {
+        $pet_html .= (in_array(strtoupper($pet_name[0]), $vowels) ? 'an ' : 'a ');
+    }
+    $pet_html .= '<span class="prompt-pet">' . $pet_name . '</span>';
+}
+
+// Construct the HTML prompt using the HTML components
+$prompt .= $emotion_html;
+if (empty($emotion_html)) { // If no emotion, add 'a' or 'an' before major feature (for HTML prompt)
+    $prompt .= (in_array(strtoupper($majorfeature['name'][0]), $vowels) ? 'an ' : 'a ');
+}
+$prompt .= $majorfeature_html;
+// $prompt .= $gender_html; // This was $gender_output before, now it is $gender_html
+if (isset($gender)) { // Only add gender if it's set
+    $prompt .= $gender_html; // Add the HTML gender string
+}
+$prompt .= $baseclass_html;
+$prompt .= $accessories_output_html;
+$prompt .= $pet_html;
 
 // store IDs
 
@@ -193,5 +276,22 @@ if ($existingId) {
     $share_id = $pdo->lastInsertId();
 }
 
-echo htmlspecialchars($prompt) . '<br /><a href="share/' . $share_id . '">Share this prompt</a>';
+echo $prompt . '<br /><a href="share/' . $share_id . '">Share this prompt</a>';
+
+// Social Media Sharing
+$encoded_prompt = urlencode($plain_text_prompt);
+// Construct the base URL dynamically
+$scheme = isset($_SERVER['REQUEST_SCHEME']) ? $_SERVER['REQUEST_SCHEME'] : 'http';
+$host = $_SERVER['HTTP_HOST'];
+$base_share_url = $scheme . '://' . $host . '/share/' . $share_id;
+
+$twitter_url = "https://twitter.com/intent/tweet?text=" . $encoded_prompt . "&url=" . urlencode($base_share_url) . "&hashtags=ysdidea";
+$facebook_url = "https://www.facebook.com/sharer/sharer.php?u=" . urlencode($base_share_url) . "&quote=" . $encoded_prompt;
+$pinterest_url = "https://pinterest.com/pin/create/button/?url=" . urlencode($base_share_url) . "&description=" . $encoded_prompt;
+
+echo '<div class="social-share">';
+echo '<a href="' . htmlspecialchars($twitter_url) . '" target="_blank" class="twitter">Tweet</a>';
+echo '<a href="' . htmlspecialchars($facebook_url) . '" target="_blank" class="facebook">Share</a>';
+echo '<a href="' . htmlspecialchars($pinterest_url) . '" target="_blank" class="pinterest">Pin</a>';
+echo '</div>';
 
