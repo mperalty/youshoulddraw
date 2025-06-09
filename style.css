@@ -18,15 +18,21 @@ h3 {
 	padding: 25px 15px;
 	margin: 20px auto;
 	background: #fff; /* Existing, seems fine for contrast with new body bg */
-	border: 2px solid #dee2e6; /* Lightened border */
+	border: 1px solid #dee2e6; /* Lightened border */
+	border-radius: 8px; /* Added */
+	box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Added */
 }
 
-#draw_options { 
+#draw_options {
 	width: 40%;
-	display: none; 
+	display: none;
 	text-align: center;
-	margin: 10px auto;
-	padding: 10px;
+	margin: 20px auto; /* Increased margin */
+	padding: 20px; /* Increased padding */
+	background-color: #f8f9fa; /* Added */
+	border: 1px solid #dee2e6; /* Added */
+	border-radius: 8px; /* Added */
+	box-shadow: 0 2px 4px rgba(0,0,0,0.05); /* Added */
 }
 
 .subdraw_notice {
@@ -65,17 +71,54 @@ select:focus {
 	font-size: 1.2em; /* Inherits new font-family */
     border: 1px solid #ced4da; /* Standard bootstrap-like border color */
     border-radius: 4px;
+    background-color: #fff; /* Default background for light mode */
 }
 
+/* Specific styling for select#themeSelect */
+#themeSelect {
+    padding: 8px 12px; /* Modernized padding */
+    /* Inherits border, border-radius, and background from .options by default */
+}
+
+/* Styling for checkboxes and radio buttons */
+input[type="checkbox"],
+input[type="radio"] {
+    margin-right: 5px;
+    vertical-align: middle;
+    transform: scale(1.1);
+}
+
+/* Styling for labels within draw_options */
+#draw_options label {
+    display: inline-block;
+    margin-right: 5px;
+    margin-bottom: 5px; /* Consistent spacing for labels */
+}
+
+/* Standardized styles for .options.button and .submit.button */
+.options.button,
+.submit.button { /* .submit also has .button class in HTML */
+    display: inline-block; /* Ensures <a> behaves correctly, input[type=submit] already does */
+    padding: 10px 15px; /* Standardized padding */
+    font-size: 1em;     /* Standardized font size */
+    line-height: normal; /* Ensure consistent line height */
+    background-color: #007bff; /* Explicitly set for light mode, from .button */
+    color: #fff;               /* Explicitly set for light mode, from .button */
+    text-decoration: none; /* From .button, important for <a> tags */
+    border: none;          /* From .button */
+    text-shadow: none;     /* From .button */
+    box-shadow: none;      /* From .button */
+    border-radius: 4px;    /* From .button, consistent with other elements */
+    cursor: pointer;       /* Explicitly set cursor for button-like behavior */
+}
+
+/* Simplified .submit class, most properties come from .button and the common rule above */
 .submit {
-	padding: 5px 10px;
-	font-size: 1.2em; /* Inherits new font-family */
-    background-color: #007bff; /* Updated to look like a button */
-    color: #fff; /* Updated to look like a button */
-    border: none;
-    text-shadow: none;
-    box-shadow: none;
-    border-radius: 4px;
+    /* Specific overrides for .submit if any, beyond what .submit.button provides, can go here. */
+    /* For now, it primarily relies on .button and .submit.button */
+    /* background-color and color are handled by .button and its dark mode variant */
+    /* border, text-shadow, box-shadow, border-radius are handled by .button */
+    /* padding and font-size are handled by .submit.button */
 }
 
 #draw_options .left_side {
@@ -99,12 +142,14 @@ select:focus {
 
 .share {
 	font-size: 1.2rem;
-	margin: 16px 0px;
+	margin: 25px 0px; /* Increased margin-top */
 }
 
 .details {
 	color: #6c757d; /* Updated for new palette (slightly darker grey) */
-	margin-top: 12px;
+	margin-top: 25px; /* Increased margin-top */
+	border-top: 1px solid #e9ecef; /* Added */
+	padding-top: 15px; /* Added */
 }
 
 .details a {
@@ -125,18 +170,27 @@ select:focus {
 }
 #history_details {
         width: 80%;
-        margin: 10px auto;
+        margin: 20px auto; /* Increased margin */
+        padding: 20px; /* Added */
+        background-color: #f8f9fa; /* Added */
+        border: 1px solid #dee2e6; /* Added */
+        border-radius: 8px; /* Added */
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05); /* Added */
 }
 
 #history_details summary {
         background: #e9ecef; /* Light grey for summary */
         border: 1px solid #dee2e6;
-        padding: 5px 10px;
-        margin-bottom: 5px;
+        padding: 8px 12px; /* Increased padding */
+        margin-bottom: 10px; /* Increased margin */
         cursor: pointer;
         list-style: none;
-        font-weight: bold;
+        font-weight: 600; /* Made slightly bolder */
         border-radius: 4px;
+        transition: background-color 0.2s ease-in-out; /* Added transition */
+        display: flex; /* New */
+        align-items: center; /* New for vertical centering */
+        justify-content: space-between; /* New to push arrow to the right */
 }
 
 #history_details summary:hover {
@@ -159,6 +213,12 @@ select:focus {
         background-color: #f8f9fa; /* Very light hover for list items */
 }
 
+.history-arrow {
+  font-size: 0.8em; /* Adjust size as needed */
+  color: #6c757d; /* A neutral color, adjust as needed */
+  /* margin-left: 0; /* Removed as flexbox handles spacing */
+}
+
 @media (max-width: 600px) {
         h3,
         #idea_history,
@@ -173,11 +233,18 @@ select:focus {
                 display: block;
         }
 
-        .options,
-        .submit {
+        /* Ensure buttons stack correctly and take full width on small screens */
+        .options.button, /* Targeting the actual button */
+        .submit.button { /* Targeting the actual button */
                 display: block;
                 width: 100%;
-                margin-bottom: 10px;
+                margin-bottom: 10px; /* Consistent margin for stacked buttons */
+                box-sizing: border-box; /* Include padding in width calculation */
+        }
+        /* Remove general .options and .submit stacking if they are not buttons */
+        .options:not(.button),
+        .submit:not(.button) { /* If .options or .submit are used on non-button elements */
+            /* Revert stacking if needed, or apply specific small-screen styles */
         }
 }
 
@@ -190,12 +257,23 @@ select:focus {
 .prompt-gender { color: #6f42c1; } /* Updated purple */
 
 /* Social media sharing buttons */
-.social-share { margin-top: 10px; text-align: center; }
-.social-share a { display: inline-block; margin-right: 8px; padding: 8px 12px; background-color: #e9ecef; color: #212529; text-decoration: none; border-radius: 4px; }
-.social-share a:hover { background-color: #dee2e6; }
+.social-share { margin-top: 10px; text-align: center; } /* This is the container div */
+.social-share a {
+    display: inline-block;
+    margin-right: 5px; /* Slightly reduced margin */
+    padding: 3px 6px;  /* Further reduced padding */
+    background-color: #e9ecef; /* Default light mode background for generic share items */
+    color: #212529; /* Default light mode text color */
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 0.75em; /* Further reduced font size */
+    line-height: 1.2;  /* Added for better vertical alignment with smaller font */
+}
+.social-share a:hover { background-color: #dee2e6; } /* Default light mode hover */
 .social-share a.twitter { background-color: #1DA1F2; color: white; }
 .social-share a.facebook { background-color: #1877F2; color: white; }
 .social-share a.pinterest { background-color: #E60023; color: white; }
+/* Specific social media buttons will inherit the new padding and font-size from .social-share a */
 
 /* Dark mode toggle button */
 #themeToggle {
@@ -227,13 +305,26 @@ body.dark {
 
 body.dark h3 {
         background: #495057;
-        border-color: #6c757d;
+        border-color: #6c757d; /* Ensure this is the darker border for h3 in dark mode */
         color: #17a2b8;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.25); /* Adjusted shadow for dark mode */
+}
+
+body.dark #draw_options {
+        background-color: #495057;
+        border-color: #6c757d;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2); /* Adjusted shadow for dark mode */
 }
 
 body.dark #idea_history {
+        background-color: #495057; /* This is for the UL inside, which is fine */
+        border-color: #6c757d;
+}
+
+body.dark #history_details { /* Styles for the container in dark mode */
         background-color: #495057;
         border-color: #6c757d;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2); /* Adjusted shadow for dark mode */
 }
 
 body.dark #idea_history li {
@@ -253,29 +344,46 @@ body.dark #idea_history li:hover {
 }
 
 body.dark #history_details summary {
-        background: #495057;
-        border-color: #6c757d;
+        background: #495057; /* Darker summary bg */
+        border-color: #6c757d; /* Darker border for summary */
         color: #f8f9fa;
-        font-weight: bold;
+        font-weight: 600; /* Match light mode boldness */
 }
 body.dark #history_details summary:hover {
-        background-color: #5a6268;
+        background-color: #5a6268; /* Slightly lighter on hover */
+}
+
+body.dark .history-arrow {
+  color: #adb5bd; /* Lighter color for dark mode */
 }
 
 
-body.dark .button, body.dark .submit { /* Combined for consistency */
+/* Ensure dark mode for .button also covers .options.button */
+body.dark .button,
+body.dark .options.button, /* Explicitly include .options.button if needed */
+body.dark .submit.button { /* Explicitly include .submit.button for dark mode */
         background-color: #0056b3;
         color: #fff;
 }
+/* If .submit has other specific dark mode overrides, they would go into body.dark .submit */
+/* However, the common rule body.dark .submit.button should cover it */
 
 body.dark .options { /* Dark mode for form inputs/selects */
-    background-color: #495057;
+    background-color: #495057; /* Dark mode background */
     color: #f8f9fa;
     border-color: #6c757d;
 }
 
+/* Ensure select#themeSelect also uses dark mode background if not covered by .options */
+body.dark #themeSelect {
+    background-color: #495057; /* Explicit dark background for select */
+    color: #f8f9fa; /* Ensure text is readable */
+    border-color: #6c757d; /* Match other dark mode inputs */
+}
+
 body.dark .details {
         color: #adb5bd;
+        border-top-color: #495057; /* Darker border for details section */
 }
 
 body.dark .details a {
@@ -283,6 +391,7 @@ body.dark .details a {
 }
 
 /* Dark mode adjustments for social share buttons */
+/* This rule applies to generic share items in dark mode if not overridden by platform specifics */
 body.dark .social-share a {
     background-color: #495057;
     color: #f8f9fa;
@@ -290,7 +399,9 @@ body.dark .social-share a {
 body.dark .social-share a:hover {
     background-color: #5a6268;
 }
-/* Platform-specific buttons (twitter, facebook, pinterest) retain their brand colors. */
+/* Platform-specific buttons (twitter, facebook, pinterest) retain their brand colors in dark mode,
+   so their background/color should not be overridden by the general body.dark .social-share a rule.
+   The current structure is fine: specific styles like .social-share a.twitter override the general ones. */
 
 /* Dark mode for keyboard focus outline */
 body.dark .button:focus,

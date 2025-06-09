@@ -64,7 +64,7 @@ function addToHistory(text) {
   list.innerHTML = '';
 
   if (historyItems.length > 0) {
-    summary.innerHTML = historyItems[0];
+    summary.innerHTML = '<span class="history-summary-text">' + historyItems[0] + '</span>' + '<span class="history-arrow">&#x25BC;</span>';
     historyItems.slice(1).forEach(item => {
       const li = document.createElement('li');
       li.innerHTML = item;
@@ -84,10 +84,37 @@ function fetchIdea(formData) {
   .then(res => res.text())
   .then(data => {
     const main = document.querySelector('.main');
+
+    // New logic starts here
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = data;
+
+    const socialButtonsContainer = document.getElementById('social-media-buttons-container');
+    socialButtonsContainer.innerHTML = ''; // Clear previous buttons
+
+    // Try to find a .social-share div within the fetched data.
+    const fetchedSocialShareDiv = tempDiv.querySelector('.social-share');
+
+    if (fetchedSocialShareDiv) {
+      // Move the social buttons to their dedicated container
+      // Assuming fetchedSocialShareDiv is the block of buttons (e.g., a div containing <a> tags)
+      socialButtonsContainer.appendChild(fetchedSocialShareDiv.cloneNode(true));
+
+      // Remove the social share div from the temporary div to isolate the main prompt
+      fetchedSocialShareDiv.remove();
+    }
+
+    // The remaining content in tempDiv is the main prompt
+    const newMainContent = tempDiv.innerHTML;
+
+    // Update history logic: Add to history *before* updating main.innerHTML
+    // This ensures we capture the *previous* idea.
     if (main.innerHTML.trim() !== '') {
       addToHistory(main.innerHTML);
     }
-    main.innerHTML = data;
+
+    main.innerHTML = newMainContent;
+    // New logic ends here
   });
 }
 
@@ -142,6 +169,7 @@ document.addEventListener('DOMContentLoaded', function() {
 <button id="themeToggle" aria-label="Toggle dark mode">🌙</button>
 <button id="fontToggle" aria-label="Toggle large text">A+</button>
 <h3 id="maincontent" class="main" aria-live="polite"></h3>
+<div id="social-media-buttons-container" class="social-share"></div>
 <details id="history_details" style="display:none;">
   <summary id="history_summary"></summary>
   <ul id="idea_history"></ul>
