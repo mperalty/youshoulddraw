@@ -108,7 +108,10 @@ select:focus {
 #idea_history {
         width: 80%;
         margin: 10px auto;
-        padding: 0;
+        padding: 10px; /* Added padding */
+        background-color: #f9f9f9; /* Subtle background for the list */
+        border: 1px solid #ddd; /* Border for the list */
+        border-radius: 4px; /* Optional: rounded corners */
 }
 #history_details {
         width: 80%;
@@ -122,14 +125,27 @@ select:focus {
         margin-bottom: 5px;
         cursor: pointer;
         list-style: none;
+        font-weight: bold;
+}
+
+#history_details summary:hover {
+        background-color: #f0f0f0;
 }
 
 #idea_history li {
         background: #fff;
-        border: 1px solid #ccc;
-        padding: 5px 10px;
-        margin: 5px 0;
+        padding: 10px 15px; /* Increased padding */
+        margin: 0; /* Remove margin, use padding and border for spacing */
         list-style: none;
+        border-bottom: 1px solid #ddd; /* Bottom border for separation */
+}
+
+#idea_history li:last-child {
+        border-bottom: none; /* Remove border from last item */
+}
+
+#idea_history li:hover {
+        background-color: #e9e9e9; /* Hover effect for list items */
 }
 
 @media (max-width: 600px) {
@@ -188,15 +204,36 @@ body.dark h3 {
         color: #0bf;
 }
 
+body.dark #idea_history {
+        background-color: #282828; /* Dark mode background for the list - refined */
+        border-color: #484848; /* Dark mode border for the list - refined */
+}
+
 body.dark #idea_history li {
         background: #333;
-        border-color: #555;
+        border-color: #484848; /* Adjusted for consistency, will be overridden by border-bottom - refined */
         color: #eee;
+        /* font-weight: bold; REMOVED - this was likely an error from previous merge */
+        padding: 10px 15px; /* Ensure padding matches light mode */
+        border-bottom: 1px solid #484848; /* Dark mode bottom border - refined */
+}
+
+body.dark #idea_history li:last-child {
+        border-bottom: none; /* Remove border from last item in dark mode */
+}
+
+body.dark #idea_history li:hover {
+        background-color: #383838; /* Dark mode hover for list items */
+}
+
+body.dark #history_details summary:hover {
+        background-color: #444; /* Darker hover for dark mode */
 }
 body.dark #history_details summary {
         background: #333;
         border-color: #555;
         color: #eee;
+        font-weight: bold; /* This was correctly placed for summary, ensuring it stays */
 }
 
 body.dark .button {
