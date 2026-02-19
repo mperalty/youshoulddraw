@@ -1,466 +1,297 @@
+:root {
+  --bg: #f3f5ff;
+  --surface: #ffffff;
+  --surface-soft: #f6f8ff;
+  --text: #171b2e;
+  --muted: #5d6280;
+  --primary: #5661ff;
+  --primary-strong: #4049d9;
+  --ring: #97a0ff;
+  --border: #dce0ff;
+  --shadow: 0 18px 40px rgba(34, 42, 93, 0.12);
+}
+
+* { box-sizing: border-box; }
+
 body {
-        background-color: #f8f9fa; /* Updated */
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"; /* Updated */
-        color: #212529; /* Updated */
-        font-size: 16px; /* Explicitly set base font size for better control with large-text mode */
+  margin: 0;
+  min-height: 100vh;
+  font-family: "Open Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: radial-gradient(circle at top right, #e3e8ff 0%, var(--bg) 35%, #eef2ff 100%);
+  color: var(--text);
 }
 
-/* Large text mode for visually impaired users */
-body.large-text {
-        font-size: 1.25em; /* This will now be 1.25 * 16px = 20px */
+body.large-text { font-size: 1.2em; }
+
+.skip-link {
+  position: absolute;
+  left: -999px;
+  top: -999px;
+  background: #fff;
+  color: #000;
+  padding: 10px 14px;
+  border-radius: 8px;
+  z-index: 1000;
 }
 
-h3 {
-	width: 80%;
-	font-size: 2.0em; /* Inherits new font-family */
-	text-align: center;
-	color: #007bff; /* Updated to new primary color */
-	padding: 25px 15px;
-	margin: 20px auto;
-	background: #fff; /* Existing, seems fine for contrast with new body bg */
-	border: 1px solid #dee2e6; /* Lightened border */
-	border-radius: 8px; /* Added */
-	box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Added */
+.skip-link:focus {
+  left: 12px;
+  top: 12px;
 }
 
-#draw_options {
-	width: 40%;
-	display: none;
-	text-align: center;
-	margin: 20px auto; /* Increased margin */
-	padding: 20px; /* Increased padding */
-	background-color: #f8f9fa; /* Added */
-	border: 1px solid #dee2e6; /* Added */
-	border-radius: 8px; /* Added */
-	box-shadow: 0 2px 4px rgba(0,0,0,0.05); /* Added */
+.utility-buttons {
+  position: fixed;
+  top: 18px;
+  right: 18px;
+  z-index: 5;
+  display: flex;
+  gap: 8px;
 }
 
-.subdraw_notice {
-	text-align: center;
-	margin: 10px auto;
+.utility-button {
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.85);
+  color: var(--text);
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  cursor: pointer;
 }
 
-.subdraw_notice a { /* This is for a link inside .subdraw_notice, usually on a colored background if any */
-	color: #fff; /* Assuming it's on a dark background, check context if used elsewhere */
-	text-decoration: none;
+.app-shell {
+  width: min(1100px, 94vw);
+  margin: 48px auto;
 }
 
-.button {
-        background-color: #007bff; /* Updated */
-        color: #fff;
-        text-decoration: none;
-        text-shadow:none;
-        border:none;
-        box-shadow:none;
-        border-radius: 4px; /* Added for consistency */
+.hero {
+  margin-bottom: 24px;
 }
 
-/* Keyboard focus outline */
-.button:focus,
-#themeToggle:focus,
-#fontToggle:focus,
-a:focus,
-input:focus,
-select:focus {
-        outline: 2px dashed #0056b3; /* Using a darker shade of primary for better visibility */
-        outline-offset: 2px;
+.kicker {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0;
 }
 
-.options { /* For select, input fields */
-	padding: 5px 10px;
-	font-size: 1.2em; /* Inherits new font-family */
-    border: 1px solid #ced4da; /* Standard bootstrap-like border color */
-    border-radius: 4px;
-    background-color: #fff; /* Default background for light mode */
+h1 {
+  margin: 8px 0;
+  font-size: clamp(2rem, 4vw, 3rem);
 }
 
-/* Specific styling for select#themeSelect */
-#themeSelect {
-    padding: 8px 12px; /* Modernized padding */
-    /* Inherits border, border-radius, and background from .options by default */
+.hero-copy {
+  margin: 0;
+  color: var(--muted);
+  max-width: 640px;
 }
 
-/* Styling for checkboxes and radio buttons */
-input[type="checkbox"],
-input[type="radio"] {
-    margin-right: 5px;
-    vertical-align: middle;
-    transform: scale(1.1);
+.content-grid {
+  display: grid;
+  grid-template-columns: 1.35fr 1fr;
+  gap: 18px;
 }
 
-/* Styling for labels within draw_options */
-#draw_options label {
-    display: inline-block;
-    margin-right: 5px;
-    margin-bottom: 5px; /* Consistent spacing for labels */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  box-shadow: var(--shadow);
+  padding: 24px;
 }
 
-/* Standardized styles for .options.button and .submit.button */
-.options.button,
-.submit.button { /* .submit also has .button class in HTML */
-    padding: 10px 15px; /* Standardized padding */
-    font-size: 1em;     /* Standardized font size */
-    /* text-decoration, border, border-radius, box-shadow, text-shadow, background-color, color
-       are primarily inherited from the general .button class */
-    display: inline-block; /* Ensures <a> behaves correctly, input[type=submit] already does */
-    line-height: normal; /* Ensure consistent line height */
+.prompt-panel h2,
+.controls-panel h2 {
+  margin-top: 0;
+  margin-bottom: 14px;
 }
 
-/* Simplified .submit class, most properties come from .button and the common rule above */
-.submit {
-    /* Specific overrides for .submit if any, beyond what .submit.button provides, can go here. */
-    /* For now, it primarily relies on .button and .submit.button */
-    /* background-color and color are handled by .button and its dark mode variant */
-    /* border, text-shadow, box-shadow, border-radius are handled by .button */
-    /* padding and font-size are handled by .submit.button */
+h3.main {
+  margin: 0;
+  background: linear-gradient(145deg, #ffffff, var(--surface-soft));
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 20px;
+  font-size: clamp(1.25rem, 2.6vw, 1.8rem);
+  line-height: 1.45;
+  min-height: 140px;
 }
 
-#draw_options .left_side {
-	display: inline-block;
-	position: relative;
-	width: 48%;
-	text-align: left;
+h3.main.loading { opacity: 0.75; }
+h3.main.placeholder { color: var(--muted); }
+
+.history {
+  margin-top: 14px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface-soft);
+  padding: 10px;
 }
 
-#draw_options .right_side {
-	display: inline-block;
-	position: relative;
-	width: 48%;
-	text-align: left;
-}
-
-.share, .details {
-	text-align: center;
-	margin: 0 auto;
-}
-
-.share {
-	font-size: 1.2rem;
-	margin: 25px 0px; /* Increased margin-top */
-}
-
-.details {
-	color: #6c757d; /* Updated for new palette (slightly darker grey) */
-	margin-top: 25px; /* Increased margin-top */
-	border-top: 1px solid #e9ecef; /* Added */
-	padding-top: 15px; /* Added */
-}
-
-.details a {
-        color: #0056b3; /* Darker shade of new primary for links */
-}
-
-.hidden {
-        display: none;
+#history_summary {
+  cursor: pointer;
+  color: var(--muted);
+  font-weight: 600;
 }
 
 #idea_history {
-        width: 80%;
-        margin: 10px auto;
-        padding: 10px;
-        background-color: #fff; /* Keep white for contrast, or use a very light grey e.g. #e9ecef */
-        border: 1px solid #dee2e6; /* Lightened border */
-        border-radius: 4px;
-}
-#history_details {
-        width: 80%;
-        margin: 20px auto; /* Increased margin */
-        padding: 20px; /* Added */
-        background-color: #f8f9fa; /* Added */
-        border: 1px solid #dee2e6; /* Added */
-        border-radius: 8px; /* Added */
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05); /* Added */
-}
-
-#history_details summary {
-        background: #e9ecef; /* Light grey for summary */
-        border: 1px solid #dee2e6;
-        padding: 8px 12px; /* Increased padding */
-        margin-bottom: 10px; /* Increased margin */
-        cursor: pointer;
-        list-style: none;
-        font-weight: 600; /* Made slightly bolder */
-        border-radius: 4px;
-        transition: background-color 0.2s ease-in-out; /* Added transition */
-}
-
-#history_details summary:hover {
-        background-color: #ced4da;
+  margin: 8px 0 0;
+  padding: 0;
 }
 
 #idea_history li {
-        background: #fff;
-        padding: 10px 15px;
-        margin: 0;
-        list-style: none;
-        border-bottom: 1px solid #dee2e6; /* Lightened border */
+  list-style: none;
+  margin-bottom: 8px;
+  padding: 10px;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 8px;
 }
 
-#idea_history li:last-child {
-        border-bottom: none;
+.controls-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
 }
 
-#idea_history li:hover {
-        background-color: #f8f9fa; /* Very light hover for list items */
+#draw_options {
+  display: none;
+  gap: 20px;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface-soft);
 }
 
-.history-arrow {
-  font-size: 0.8em; /* Adjust size as needed */
-  color: #6c757d; /* A neutral color, adjust as needed */
-  margin-left: 5px; /* Space between text and arrow */
+#draw_options.is-open {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
 }
 
-@media (max-width: 600px) {
-        h3,
-        #idea_history,
-        #draw_options,
-        #history_details {
-                width: 95%;
-        }
-
-        #draw_options .left_side,
-        #draw_options .right_side {
-                width: 100%;
-                display: block;
-        }
-
-        /* Ensure buttons stack correctly and take full width on small screens */
-        .options.button, /* Targeting the actual button */
-        .submit.button { /* Targeting the actual button */
-                display: block;
-                width: 100%;
-                margin-bottom: 10px; /* Consistent margin for stacked buttons */
-                box-sizing: border-box; /* Include padding in width calculation */
-        }
-        /* Remove general .options and .submit stacking if they are not buttons */
-        .options:not(.button),
-        .submit:not(.button) { /* If .options or .submit are used on non-button elements */
-            /* Revert stacking if needed, or apply specific small-screen styles */
-        }
+#draw_options label {
+  display: block;
+  margin-bottom: 10px;
 }
 
-/* Prompt specific styles */
-.prompt-base-class { color: #28a745; font-weight: bold; } /* Updated green for better harmony */
-.prompt-major-feature { color: #fd7e14; } /* Updated orange */
-.prompt-accessory { color: #17a2b8; font-style: italic; } /* Updated teal/blue */
-.prompt-emotion { color: #dc3545; } /* Updated red */
-.prompt-pet { color: #ffc107; } /* Yellow - kept, good contrast */
-.prompt-gender { color: #6f42c1; } /* Updated purple */
-
-/* Social media sharing buttons */
-.social-share { margin-top: 10px; text-align: center; }
-.social-share a { display: inline-block; margin-right: 8px; padding: 5px 8px; background-color: #e9ecef; color: #212529; text-decoration: none; border-radius: 4px; font-size: 0.9em; } /* Reduced padding and font size */
-.social-share a:hover { background-color: #dee2e6; }
-.social-share a.twitter { background-color: #1DA1F2; color: white; }
-.social-share a.facebook { background-color: #1877F2; color: white; }
-.social-share a.pinterest { background-color: #E60023; color: white; }
-/* Specific social media buttons will inherit the new padding and font-size from .social-share a */
-
-/* Dark mode toggle button */
-#themeToggle {
-        position: fixed;
-        top: 10px;
-        right: 10px;
-        background: none;
-        border: none;
-        font-size: 1.5rem;
-        cursor: pointer;
+input[type="checkbox"], input[type="radio"] {
+  margin-right: 8px;
 }
 
-/* Large text toggle button */
-#fontToggle {
-        position: fixed;
-        top: 50px;
-        right: 10px;
-        background: none;
-        border: none;
-        font-size: 1.2rem;
-        cursor: pointer;
+.options,
+select,
+input[type="submit"],
+button {
+  font: inherit;
 }
 
-/* Dark mode styles */
+#themeSelect {
+  width: 100%;
+  padding: 9px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: #fff;
+}
+
+.button,
+.ghost-button {
+  border-radius: 10px;
+  border: 1px solid transparent;
+  cursor: pointer;
+}
+
+.submit.button {
+  width: 100%;
+  margin-top: 14px;
+  padding: 12px 14px;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--primary), #7581ff);
+  color: #fff;
+}
+
+.submit.button:hover { background: linear-gradient(135deg, var(--primary-strong), var(--primary)); }
+
+.ghost-button {
+  background: transparent;
+  border-color: var(--border);
+  color: var(--muted);
+  padding: 8px 12px;
+}
+
+.button:focus,
+.utility-button:focus,
+.ghost-button:focus,
+a:focus,
+input:focus,
+select:focus {
+  outline: 3px solid var(--ring);
+  outline-offset: 2px;
+}
+
+.prompt-base-class { color: #1e9b75; font-weight: 700; }
+.prompt-major-feature { color: #f06d47; font-weight: 700; }
+.prompt-accessory { color: #4f6fff; font-style: italic; }
+.prompt-emotion { color: #be3672; font-weight: 700; }
+.prompt-pet { color: #c9941c; }
+.prompt-gender { color: #6f42c1; }
+
+.social-share {
+  margin-top: 14px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.social-share a {
+  text-decoration: none;
+  padding: 6px 10px;
+  border-radius: 999px;
+  color: #fff;
+  font-size: 0.9rem;
+}
+
+.social-share .twitter { background: #1da1f2; }
+.social-share .facebook { background: #1877f2; }
+.social-share .pinterest { background: #e60023; }
+
+.share, .details {
+  margin-top: 12px;
+  color: var(--muted);
+}
+
+.details a { color: var(--primary-strong); }
+
 body.dark {
-        background-color: #343a40;
-        color: #f8f9fa;
+  --bg: #101423;
+  --surface: #181d32;
+  --surface-soft: #1f2640;
+  --text: #f4f6ff;
+  --muted: #b2bad6;
+  --primary: #7884ff;
+  --primary-strong: #95a0ff;
+  --ring: #a7afff;
+  --border: #2f365d;
+  --shadow: 0 18px 40px rgba(3, 5, 14, 0.55);
+  background: radial-gradient(circle at top right, #1b2240 0%, #101423 48%, #0d1120 100%);
 }
 
-body.dark h3 {
-        background: #495057;
-        border-color: #6c757d; /* Ensure this is the darker border for h3 in dark mode */
-        color: #17a2b8;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.25); /* Adjusted shadow for dark mode */
+body.dark .utility-button {
+  background: rgba(18, 24, 45, 0.85);
 }
 
-body.dark #draw_options {
-        background-color: #495057;
-        border-color: #6c757d;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.2); /* Adjusted shadow for dark mode */
-}
-
-body.dark #idea_history {
-        background-color: #495057; /* This is for the UL inside, which is fine */
-        border-color: #6c757d;
-}
-
-body.dark #history_details { /* Styles for the container in dark mode */
-        background-color: #495057;
-        border-color: #6c757d;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.2); /* Adjusted shadow for dark mode */
-}
-
+body.dark #themeSelect,
 body.dark #idea_history li {
-        background: #5a6268;
-        border-color: #6c757d;
-        color: #f8f9fa;
-        padding: 10px 15px;
-        border-bottom: 1px solid #6c757d;
+  background: #141a2e;
+  color: var(--text);
 }
 
-body.dark #idea_history li:last-child {
-        border-bottom: none;
+@media (max-width: 850px) {
+  .content-grid { grid-template-columns: 1fr; }
 }
 
-body.dark #idea_history li:hover {
-        background-color: #6c757d;
-}
-
-body.dark #history_details summary {
-        background: #495057; /* Darker summary bg */
-        border-color: #6c757d; /* Darker border for summary */
-        color: #f8f9fa;
-        font-weight: 600; /* Match light mode boldness */
-}
-body.dark #history_details summary:hover {
-        background-color: #5a6268; /* Slightly lighter on hover */
-}
-
-body.dark .history-arrow {
-  color: #adb5bd; /* Lighter color for dark mode */
-}
-
-
-/* Ensure dark mode for .button also covers .options.button */
-body.dark .button,
-body.dark .options.button, /* Explicitly include .options.button if needed */
-body.dark .submit.button { /* Explicitly include .submit.button for dark mode */
-        background-color: #0056b3;
-        color: #fff;
-}
-/* If .submit has other specific dark mode overrides, they would go into body.dark .submit */
-/* However, the common rule body.dark .submit.button should cover it */
-
-body.dark .options { /* Dark mode for form inputs/selects */
-    background-color: #495057; /* Dark mode background */
-    color: #f8f9fa;
-    border-color: #6c757d;
-}
-
-/* Ensure select#themeSelect also uses dark mode background if not covered by .options */
-body.dark #themeSelect {
-    background-color: #495057; /* Explicit dark background for select */
-    color: #f8f9fa; /* Ensure text is readable */
-    border-color: #6c757d; /* Match other dark mode inputs */
-}
-
-body.dark .details {
-        color: #adb5bd;
-        border-top-color: #495057; /* Darker border for details section */
-}
-
-body.dark .details a {
-        color: #6cb2eb;
-}
-
-/* Dark mode adjustments for social share buttons */
-body.dark .social-share a {
-    background-color: #495057;
-    color: #f8f9fa;
-}
-body.dark .social-share a:hover {
-    background-color: #5a6268;
-}
-/* Platform-specific buttons (twitter, facebook, pinterest) retain their brand colors. */
-
-/* Dark mode for keyboard focus outline */
-body.dark .button:focus,
-body.dark #themeToggle:focus,
-body.dark #fontToggle:focus,
-body.dark a:focus,
-body.dark input:focus,
-body.dark select:focus {
-        outline: 2px dashed #6cb2eb; /* Lighter blue for dark mode focus */
-}
-
-
-/* Skip link for keyboard users */
-.skip-link {
-        position: absolute;
-        left: -999px;
-        top: -999px;
-        background: #fff;
-        color: #000;
-        padding: 8px 12px;
-        z-index: 1000;
-}
-.skip-link:focus {
-        left: 10px;
-        top: 10px;
-}
-
-/* CRUD table styles */
-.crud-form {
-    width: 80%;
-    margin: 20px auto;
-    background: #fff; /* Light mode */
-    border: 1px solid #dee2e6; /* Light mode */
-    padding: 10px;
-    border-radius: 4px;
-}
-.crud-table {
-    width: 80%;
-    margin: 20px auto;
-    border-collapse: collapse;
-    background: #fff; /* Light mode */
-}
-.crud-table th, .crud-table td {
-    border: 1px solid #dee2e6; /* Light mode */
-    padding: 8px;
-    text-align: left;
-}
-.crud-table th {
-    background: #e9ecef; /* Light mode header */
-}
-.crud-actions form {
-    display: inline;
-}
-
-/* Dark Mode for CRUD */
-body.dark .crud-form {
-    background: #495057;
-    border-color: #6c757d;
-}
-body.dark .crud-table {
-    background: #5a6268;
-    border-color: #6c757d;
-}
-body.dark .crud-table th, body.dark .crud-table td {
-    border-color: #6c757d;
-}
-body.dark .crud-table th {
-    background: #495057;
-    color: #f8f9fa;
-}
-body.dark .crud-form input[type="text"],
-body.dark .crud-form input[type="number"],
-body.dark .crud-form select,
-body.dark .crud-form textarea {
-    background-color: #343a40;
-    color: #f8f9fa;
-    border: 1px solid #6c757d;
-}
-body.dark .crud-form input[type="submit"],
-body.dark .crud-form button {
-    background-color: #0056b3;
-    color: #fff;
-    border: none;
+@media (max-width: 640px) {
+  .app-shell { margin-top: 72px; }
+  #draw_options.is-open { grid-template-columns: 1fr; }
+  .controls-header { flex-direction: column; align-items: flex-start; }
 }

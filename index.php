@@ -7,7 +7,8 @@ if (file_exists($config)) {
 if (function_exists('getPDO')) {
     $pdo = getPDO();
 } else {
-    $type = getenv('YSD_DB_TYPE') ?: 'mysql';
+    $dbType = getenv('YSD_DB_TYPE');
+    $type = $dbType ?: ((getenv('YSD_DB_USER') && getenv('YSD_DB_NAME')) ? 'mysql' : 'sqlite');
     if ($type === 'sqlite') {
         $path = getenv('YSD_DB_PATH') ?: __DIR__ . '/ysd.sqlite';
         $pdo = new PDO('sqlite:' . $path);
@@ -33,27 +34,14 @@ try {
 <html lang="en">
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>You Should Draw - Random Character Art Ideas Generator</title>
   <meta name="description" content="You Should Draw - Random Character Art Ideas Generator">
   <meta name="author" content="Malcolm Peralty">
-
   <link rel="stylesheet" href="/style.css">
-  <link rel='stylesheet' id='open-sans-css'  href='//fonts.googleapis.com/css?family=Open+Sans%3A300italic%2C400italic%2C600italic%2C300%2C400%2C600&#038;subset=latin%2Clatin-ext&#038;ver=4.5.2' type='text/css' media='all' />
-
-  <!--[if lt IE 9]>
-    <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-  <![endif]-->
-
+  <link rel='stylesheet' id='open-sans-css' href='//fonts.googleapis.com/css?family=Open+Sans%3A300italic%2C400italic%2C600italic%2C300%2C400%2C600&#038;subset=latin%2Clatin-ext&#038;ver=4.5.2' type='text/css' media='all' />
 <script type="text/javascript">
 let historyItems = [];
-function toggleDiv(divId) {
-  const el = document.getElementById(divId);
-  if (window.getComputedStyle(el).display === 'none') {
-    el.style.display = 'block';
-  } else {
-    el.style.display = 'none';
-  }
-}
 
 function addToHistory(text) {
   historyItems.unshift(text);
@@ -61,22 +49,33 @@ function addToHistory(text) {
 
   const summary = document.getElementById('history_summary');
   const list = document.getElementById('idea_history');
+  const details = document.getElementById('history_details');
   list.innerHTML = '';
 
   if (historyItems.length > 0) {
-    summary.innerHTML = historyItems[0] + ' <span class="history-arrow">&#x25BC;</span>';
+    summary.innerHTML = historyItems[0] + ' <span class="history-arrow">▾</span>';
     historyItems.slice(1).forEach(item => {
       const li = document.createElement('li');
       li.innerHTML = item;
       list.appendChild(li);
     });
-    document.getElementById('history_details').style.display = 'block';
+    details.hidden = false;
   } else {
-    document.getElementById('history_details').style.display = 'none';
+    details.hidden = true;
   }
 }
 
+function setLoadingState(isLoading) {
+  const main = document.querySelector('.main');
+  const submit = document.getElementById('generateButton');
+  main.classList.toggle('loading', isLoading);
+  main.setAttribute('aria-busy', isLoading ? 'true' : 'false');
+  submit.disabled = isLoading;
+  submit.value = isLoading ? 'Generating…' : 'Generate Prompt';
+}
+
 function fetchIdea(formData) {
+  setLoadingState(true);
   fetch('grabinfo.php', {
     method: 'POST',
     body: formData
@@ -84,10 +83,17 @@ function fetchIdea(formData) {
   .then(res => res.text())
   .then(data => {
     const main = document.querySelector('.main');
-    if (main.innerHTML.trim() !== '') {
+    if (main.innerHTML.trim() !== '' && !main.classList.contains('placeholder')) {
       addToHistory(main.innerHTML);
     }
+    main.classList.remove('placeholder');
     main.innerHTML = data;
+  })
+  .catch(() => {
+    document.querySelector('.main').innerHTML = 'Could not generate an idea right now. Please try again.';
+  })
+  .finally(() => {
+    setLoadingState(false);
   });
 }
 
@@ -125,6 +131,10 @@ document.addEventListener('DOMContentLoaded', function() {
     fetchIdea(formData);
   });
 
+  document.getElementById('toggleOptions').addEventListener('click', function() {
+    document.getElementById('draw_options').classList.toggle('is-open');
+  });
+
   applySavedTheme();
   applySavedFontSize();
   document.getElementById('themeToggle').addEventListener('click', function() {
@@ -135,43 +145,61 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 });
 </script>
-
 </head>
 <body>
 <a href="#maincontent" class="skip-link">Skip to content</a>
-<button id="themeToggle" aria-label="Toggle dark mode">🌙</button>
-<button id="fontToggle" aria-label="Toggle large text">A+</button>
-<h3 id="maincontent" class="main" aria-live="polite"></h3>
-<details id="history_details" style="display:none;">
-  <summary id="history_summary"></summary>
-  <ul id="idea_history"></ul>
-</details>
+<div class="utility-buttons" role="toolbar" aria-label="Display settings">
+  <button id="themeToggle" aria-label="Toggle dark mode" class="utility-button">🌙</button>
+  <button id="fontToggle" aria-label="Toggle large text" class="utility-button">A+</button>
+</div>
 
-<div id="draw_options">
-<form method="post" id="optionsform" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
-<div class="left_side"><input type="checkbox" name="gender" id="gender" value="Gender">Random Gender?<br />
-<input type="checkbox" name="emotion" id="emotion" value="Emotion">Random Emotion?<br />
-<input type="checkbox" name="pet" id="pet" value="Pet">Random Pet?</br>
-<label for="themeSelect">Theme:</label>
-<select name="theme" id="themeSelect">
-<option value="">Any Theme</option>
-<?php foreach ($themes as $t): ?>
-<option value="<?php echo htmlspecialchars($t); ?>"><?php echo htmlspecialchars($t); ?></option>
-<?php endforeach; ?>
-</select><br />
+<div class="app-shell">
+  <header class="hero">
+    <p class="kicker">Creative Prompt Generator</p>
+    <h1>You Should Draw</h1>
+    <p class="hero-copy">Generate unique character ideas in one click, then fine-tune the vibe with custom options.</p>
+  </header>
+
+  <main id="maincontent" class="content-grid">
+    <section class="prompt-panel card">
+      <h2>Your Prompt</h2>
+      <h3 class="main placeholder" aria-live="polite" aria-busy="true">Creating your first idea…</h3>
+      <details id="history_details" class="history" hidden>
+        <summary id="history_summary"></summary>
+        <ul id="idea_history"></ul>
+      </details>
+    </section>
+
+    <section class="controls-panel card">
+      <div class="controls-header">
+        <h2>Customize</h2>
+        <button type="button" id="toggleOptions" class="ghost-button">Show / Hide Options</button>
+      </div>
+
+      <form method="post" id="optionsform" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
+        <div id="draw_options">
+          <div class="left_side">
+            <label><input type="checkbox" name="gender" id="gender" value="Gender">Random gender</label>
+            <label><input type="checkbox" name="emotion" id="emotion" value="Emotion">Random emotion</label>
+            <label><input type="checkbox" name="pet" id="pet" value="Pet">Random pet</label>
+            <label for="themeSelect">Theme</label>
+            <select name="theme" id="themeSelect" class="options">
+              <option value="">Any Theme</option>
+              <?php foreach ($themes as $t): ?>
+              <option value="<?php echo htmlspecialchars($t); ?>"><?php echo htmlspecialchars($t); ?></option>
+              <?php endforeach; ?>
+            </select>
+          </div>
+          <div class="right_side">
+            <label><input type="radio" name="accessories" class="accessories" value="1" checked>One accessory</label>
+            <label><input type="radio" name="accessories" class="accessories" value="2">Two accessories</label>
+            <label><input type="radio" name="accessories" class="accessories" value="3">Three accessories</label>
+          </div>
+        </div>
+        <input type="submit" id="generateButton" class="submit button" value="Generate Prompt">
+      </form>
+    </section>
+  </main>
 </div>
-<div class="right_side">
-<input type="radio" name="accessories" class="accessories" value="1" checked>One Accessory<br />
-<input type="radio" name="accessories" class="accessories" value="2">Two Accessories<br />
-<input type="radio" name="accessories" class="accessories" value="3">Three Accessories<br />
-</div>
-</div>
-<div class="subdraw_notice">
-	<a href="javascript:toggleDiv('draw_options');" class="options button">Options</a>
-	<input type="submit" class="submit button" value="Next Idea" />
-	</form>
-</div>
-<div class="share">Please tag your images with #ysdidea so that I can find them!</div>
-<div class="details">Developed by <a href="https://www.peralty.com">Malcolm Peralty</a></div>
 </body>
 </html>

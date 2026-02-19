@@ -22,7 +22,8 @@ if($_POST){
         if (function_exists('getPDO')) {
                 $pdo = getPDO();
         } else {
-                $type = getenv('YSD_DB_TYPE') ?: 'mysql';
+                $dbType = getenv('YSD_DB_TYPE');
+                $type = $dbType ?: ((getenv('YSD_DB_USER') && getenv('YSD_DB_NAME')) ? 'mysql' : 'sqlite');
                 if ($type === 'sqlite') {
                         $path = getenv('YSD_DB_PATH') ?: __DIR__ . '/ysd.sqlite';
                         $pdo = new PDO('sqlite:' . $path);
@@ -36,6 +37,12 @@ if($_POST){
                 }
         }
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        try {
+                $pdo->query("SELECT 1 FROM drawoptions LIMIT 1");
+        } catch (Exception $e) {
+                echo 'No drawing options have been added yet.';
+                return;
+        }
         $driver = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
         $rand = ($driver === 'sqlite') ? 'RANDOM()' : 'RAND()';
 	
@@ -294,4 +301,3 @@ echo '<a href="' . htmlspecialchars($twitter_url) . '" target="_blank" class="tw
 echo '<a href="' . htmlspecialchars($facebook_url) . '" target="_blank" class="facebook">Share</a>';
 echo '<a href="' . htmlspecialchars($pinterest_url) . '" target="_blank" class="pinterest">Pin</a>';
 echo '</div>';
-
